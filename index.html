@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sintaxer</title>
+    <meta charset="utf8">
+<style>
+#output {display: table; width: 100%}
+.rule {display: table-row; font-family: monospace}
+.rule .item{display: table-cell}
+.rule.edit{background: #ddd;}
+.definition::before{content: '::= '; vertical-align: top;}
+.name{padding-right: 0.25em; vertical-align: top;}
+.name.repetition{color:#aaa}
+.def-item{padding-left: 0.25em; text-decoration: none}
+.even{background: #eee}
+.terminal{color:green}
+.ref-rule{color:blue}
+.semantic{color:red}
+#input{width: 100%}
+.buttons{width: 5em; background: #eee;vertical-align: top;}
+.button{width:1em; border: 1px solid black;display:inline-block;cursor: pointer}
+</style>
+<script id="templ-output" type="text/html">
+{{#rules}}
+    <div class="rule rule-{{ruleName}} {{#even}}even{{/even}} 
+{{#newRule}}head{{/newRule}}" id="rule-{{ruleName}}">
+        <span class="name item {{^newRule}}repetition{{/newRule}}">
+            {{ruleName}}
+        </span>
+        <span class="definition item">
+            {{#ruleDef}}
+                <a href="{{link}}" class="def-item {{class}}">
+                    {{item}}
+                </a>
+            {{/ruleDef}}
+        </span>
+        {{#newRule}}
+        <span class="buttons item">{{!
+            }}<span class="button jEdit">E</span>{{!
+            }}<span class="button jUp">&uparrow;</span>{{!
+            }}<span class="button jDown">&downarrow;</span>{{!
+            }}<span class="button jDelete">&times;</span>{{!
+        }}</span>
+        {{/newRule}}
+    </div>
+{{/rules}}
+</script>
+<script id="templ-edit" type="text/html">
+    <div class="rule rule-{{ruleName}} edit head" id="rule-{{ruleName}}">
+        <span class="name item">
+            {{ruleName}}
+        </span>
+        <span class="definition item">
+            <textarea class="value">{{value}}</textarea>
+        </span>
+        <span class="buttons item">{{!
+            }}<span class="button jOkEdit">&radic;</span>{{!
+            }}<span class="button jResetEdit">R</span>{{!
+        }}</span>
+    </div>
+</script>
+<script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+<script src="https://raw.githubusercontent.com/jonnyreeves/jquery-Mustache/master/jquery.mustache.js"></script>
+<script src="https://raw.github.com/janl/mustache.js/master/mustache.js"></script>
+<script>
+$(function(){
+    'use strict'
+    $.Mustache.addFromDom('templ-output');
+    $.Mustache.addFromDom('templ-edit');
+
+    function makeRuleDefinition(ruleDef){
+        return ruleDef.split(' ').map(function(ruleItem){
+            return ruleItem.trim();
+        }).filter(function(ruleItem){
+            return ruleItem.length;
+        }).map(function(ruleItem){
+            if(ruleItem[0] !== ruleItem[0].toUpperCase()){
+                return {
+                    link: '#rule-'+ruleItem,
+                    'class': 'ref-rule',
+                    item: ruleItem,
+                };
+            } 
+            if(ruleItem[0]=== '`' 
+               && ruleItem[ruleItem.length-1]==='`'){
+                ruleItem = ruleItem.substr(1, ruleItem.length-2);
+                return {
+                    link: '#func-'+ruleItem,
+                    'class': 'semantic',
+                    item: ruleItem,
+                };
+            } 
+            return {
+                link: '#term-'+ruleItem,
+                'class': 'terminal',
+                item: ruleItem,
+            };
+        });
+    }
+
+    function disassembleRuleDefinition($this){
+        if($this.is('.semantic')){
+            return '`'+$this.text().trim() + '` ';
+        }else {
+            return $this.text().trim() + ' ';
+        }
+    }
+
+    $('.jAdd').click(function(){
+        var even = true;
+        var bruteText = $('#input').val();
+        var lines = bruteText.split('\n');
+        var oldRuleName = '';
+        var rules = lines.filter(function(cline){
+            if(!cline || cline[0]==='#'){
+                return false;
+            }
+            var pos = cline.indexOf('::=');
+            if(pos === -1 || cline.indexOf('::=', pos+1) !== -1){
+                return false;
+            }
+            return true;
+        }).map(function(cline){
+            var line = cline.split('::=');
+            var ruleName = line[0].trim();
+            var ruleDef = makeRuleDefinition(line[1].trim());
+            var newRule = ruleName && ruleName !== oldRuleName;
+            if(newRule){
+                even = !even;
+                oldRuleName = ruleName;
+            }else {
+                ruleName = oldRuleName;
+            }
+            return {
+                ruleName:ruleName,
+                even: even,
+                newRule: newRule,
+                ruleDef: ruleDef,
+            };
+        });
+        $('#output').mustache('templ-output', {rules:rules});
+        $('#input').val('');
+    });
+    $('.jEditAll').click(function(){
+        var spaces = 0;
+        $('#output .rule .name').each(function(){
+            var length =$(this).text().trim().length;
+            if(length >= spaces){
+                spaces = length + 1;
+            }
+        });
+        var input = '';
+        var oldName = '';
+        $('#output .rule').each(function(){
+            var $rule = $(this);
+            var name = $rule.find('.name').text().trim();
+            if(name != oldName){
+                oldName = name;
+                input += name;
+            }else {
+                name = '';
+            }
+            var sz = spaces - name.length;
+            for(var i = 0; i < sz; ++i) {
+                input += ' ';
+            }
+            input += '::= ';
+            $rule.find('.def-item').each(function(){
+                input += disassembleRuleDefinition($(this));
+            });
+            input += '\n';
+        });    
+        $('#input').val(input);
+        $('#output').empty();
+    });
+    $('.jToogle').click(function(){
+        $('.semantic').toggle();
+    });
+    function getRuleClass($button){
+        return '.' + $button.closest('.rule').attr('id');
+    }
+    $('#output').on('click', '.jDelete', function(){
+        var $this = $(this);
+        $this.closest('.rule').nextAll().toggleClass('even');
+        $(getRuleClass($this)).remove();
+    });
+    $('#output').on('click', '.jUp', function(){
+        var $currentHead = $(this).closest('.rule');
+        var $current = $(getRuleClass($currentHead));
+        var $prevHead = $currentHead.prevAll('.head').first();
+        var $prev = $(getRuleClass($prevHead));
+        $prev.toggleClass('even');
+        $current.toggleClass('even');
+        $current.each(function(){
+            $prevHead.before($(this));
+        });
+    });
+
+    $('#output').on('click', '.jDown', function(){
+        var $currentHead = $(this).closest('.rule');
+        var $current = $(getRuleClass($currentHead));
+        var $nextHead = $currentHead.nextAll('.head').first();
+        var $next = $(getRuleClass($nextHead));
+        $next.toggleClass('even');
+        $current.toggleClass('even');
+        $next.each(function(){
+            $currentHead.before($(this));
+        });
+    });
+
+    $('#output').on('click', '.jEdit', function(){
+        var className = getRuleClass($(this));
+        var $current = $(className);
+        var newVal = '';
+        var lineCount = 0;
+        $current.each(function(){
+            $(this).find('.def-item').each(function(){
+                newVal += disassembleRuleDefinition($(this));
+            });
+            newVal += '\n';
+            lineCount ++;
+        });
+        
+        var $currentHead = $current.first();
+        var $new = $($.Mustache.render('templ-edit', {
+            ruleName: $currentHead.find('.name').text(), 
+            value:newVal
+        }));
+        $currentHead.before($new);
+        $new.data('even', $current.hasClass('even'));
+        $current.remove();
+    });
+
+    $('#output').on('click', '.jResetEdit', function(){
+        var $value = $(this).closest('.rule').find('.value');
+        $value.val($value.text());
+    });
+    $('#output').on('click', '.jOkEdit', function(){
+        var $editRule = $(this).closest('.rule');
+        var $value = $editRule.find('.value');
+        var newVal = $value.val();
+        var name = $editRule.find('.name').text().trim();
+        $editRule.before($.Mustache.render('templ-output', {
+            rules: newVal.split('\n').map(function(v){
+                return v.trim();
+            }).filter(function(cline){
+                if(!cline.trim() || cline[0]==='#'){
+                    return false;
+                }
+                return true;
+            }).map(function(ruleDef, i){
+                return {
+                    ruleName: name,
+                    even: $editRule.data('even'),
+                    newRule: i==0,
+                    ruleDef: makeRuleDefinition(ruleDef),
+                };
+            })
+        }));
+        $editRule.remove();
+    });
+    $('.jAdd').click();
+})
+</script>
+</head>
+<body>
+<button class="jToogle">Trocar Visão</button>
+<div id="output"></div>
+<textarea id="input" placeholder="New Rules Here">
+pgm         ::= stms
+stms        ::= stm .
+            ::= stm ; stms
+stm         ::= expr
+expr        ::= NUMBER `pushn`
+            ::= funcall
+            ::= varuse
+            ::= lambda
+funcall     ::= NAME args
+            ::= ( expr ) args
+args        ::= ( )
+            ::= ( argList )
+argList     ::= expr , argList
+            ::= expr
+varuse      ::= NAME
+lambda      ::= [ ] params -> type stms
+params      ::= ( )
+            ::= ( paramList )
+paramList   ::= param , params
+            ::= param
+param       ::= NAME : type
+type        ::= INTEGER
+            ::= aparams -> type
+aparams     ::= ( )
+            ::= ( aparamList )
+aparamList  ::= type , aparamList
+            ::= type
+</textarea>
+<button class="jAdd">Add</button>
+<button class="jEditAll">Edit All</button>
+</body>
+</html>
