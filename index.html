@@ -16,8 +16,8 @@
 .terminal{color:green}
 .ref-rule{color:blue}
 .semantic{color:red}
-.buttons{width: 5em; background: #eee;vertical-align: top;}
-.button{width:1em; border: 1px solid black;display:inline-block;cursor: pointer}
+#output .buttons{width: 5em; background: #eee;vertical-align: top;}
+#output .button{width:1em; border: 1px solid black;display:inline-block;cursor: pointer}
 </style>
 <script id="templ-output" type="text/html">
 {{#rules}}
@@ -136,6 +136,7 @@ $(function(){
                 ruleDef: ruleDef,
             };
         });
+        $('.buttons').show();
         $('#output').mustache('templ-output', {rules:rules});
         resizeTextArea($('#input').val(''));
     });
@@ -167,6 +168,7 @@ $(function(){
                 input += disassembleRuleDefinition($(this));
             });
             input += '\n';
+            $('.buttons').hide();
         });    
         $('#input').val(input.slice(0, -1));
         $('#output').empty();
@@ -281,9 +283,14 @@ $(function(){
 </script>
 </head>
 <body>
-<button class="jToogle">Change View</button>
-<div id="output"></div>
-<textarea id="input" placeholder="New Rules Here">
+<section id="sintax">
+	<h1>Syntax</h1>
+	<div class="buttons">
+		<button class="jToogle">Change View</button>
+		<button class="jEditAll">Edit All</button>
+	</div>
+	<div id="output"></div>
+	<textarea id="input" placeholder="New Rules Here">
 pgm         ::= {begin-stack} {begin-symboltbl} stms {end-symboltbl} {result[$0]} {end-stack} 
 stms        ::= stm . 
             ::= stm {stack-pop} ; stms 
@@ -315,8 +322,8 @@ aparamList  ::= ( {begin-signature} )
             ::= ( {begin-signature} aparamList ) 
 aparams     ::= type {signature-add[type]} {end-type} , aparams 
             ::= type {signature-add[type]} {end-type} 
-</textarea>
-<button class="jAdd">Add</button>
-<button class="jEditAll">Edit All</button>
+	</textarea>
+	<button class="jAdd">Add</button>
+</section>
 </body>
 </html>
