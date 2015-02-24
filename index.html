@@ -16,7 +16,6 @@
 .terminal{color:green}
 .ref-rule{color:blue}
 .semantic{color:red}
-#input{width: 100%}
 .buttons{width: 5em; background: #eee;vertical-align: top;}
 .button{width:1em; border: 1px solid black;display:inline-block;cursor: pointer}
 </style>
@@ -81,9 +80,8 @@ $(function(){
                     item: ruleItem,
                 };
             } 
-            if(ruleItem[0]=== '`' 
-               && ruleItem[ruleItem.length-1]==='`'){
-                ruleItem = ruleItem.substr(1, ruleItem.length-2);
+            if(ruleItem[0]=== '{' 
+               && ruleItem[ruleItem.length-1]==='}'){
                 return {
                     link: '#func-'+ruleItem,
                     'class': 'semantic',
@@ -99,11 +97,11 @@ $(function(){
     }
 
     function disassembleRuleDefinition($this){
-        if($this.is('.semantic')){
-            return '`'+$this.text().trim() + '` ';
-        }else {
+        //if($this.is('.semantic')){
+        //    return '`'+$this.text().trim() + '` ';
+        //}else {
             return $this.text().trim() + ' ';
-        }
+        //}
     }
 
     $('.jAdd').click(function(){
@@ -139,7 +137,7 @@ $(function(){
             };
         });
         $('#output').mustache('templ-output', {rules:rules});
-        $('#input').val('');
+        resizeTextArea($('#input').val(''));
     });
     $('.jEditAll').click(function(){
         var spaces = 0;
@@ -170,8 +168,9 @@ $(function(){
             });
             input += '\n';
         });    
-        $('#input').val(input);
+        $('#input').val(input.slice(0, -1));
         $('#output').empty();
+        resizeTextArea($('#input'));
     });
     $('.jToogle').click(function(){
         $('.semantic').toggle();
@@ -220,15 +219,18 @@ $(function(){
             newVal += '\n';
             lineCount ++;
         });
+
         
         var $currentHead = $current.first();
         var $new = $($.Mustache.render('templ-edit', {
             ruleName: $currentHead.find('.name').text(), 
-            value:newVal
+            value:newVal.slice(0, -1)
         }));
         $currentHead.before($new);
         $new.data('even', $current.hasClass('even'));
         $current.remove();
+
+        resizeTextArea($new.find('textarea'));
     });
 
     $('#output').on('click', '.jResetEdit', function(){
@@ -259,41 +261,60 @@ $(function(){
         }));
         $editRule.remove();
     });
+    function resizeTextArea($textarea){
+    	var lines = $textarea.val().split('\n');
+    	var nrows = lines.length;
+    	var ncols = lines.reduce(function(prev, curr){
+    		return Math.max(prev, curr.length);
+    	}, 0);
+    	$textarea.attr('rows', Math.max(1, nrows-1));
+    	$textarea.attr('cols', Math.max(ncols, 40));
+    }
+    $('body').on('input', 'textarea', function(){
+    	var $this = $(this);
+    	resizeTextArea($this);
+    });
+
+    //Dirt trick
     $('.jAdd').click();
 })
 </script>
 </head>
 <body>
-<button class="jToogle">Trocar Visão</button>
+<button class="jToogle">Change View</button>
 <div id="output"></div>
 <textarea id="input" placeholder="New Rules Here">
-pgm         ::= stms
-stms        ::= stm .
-            ::= stm ; stms
-stm         ::= expr
-expr        ::= NUMBER `pushn`
-            ::= funcall
-            ::= varuse
-            ::= lambda
-funcall     ::= NAME args
-            ::= ( expr ) args
-args        ::= ( )
-            ::= ( argList )
-argList     ::= expr , argList
-            ::= expr
-varuse      ::= NAME
-lambda      ::= [ ] params -> type stms
-params      ::= ( )
-            ::= ( paramList )
-paramList   ::= param , params
-            ::= param
-param       ::= NAME : type
-type        ::= INTEGER
-            ::= aparams -> type
-aparams     ::= ( )
-            ::= ( aparamList )
-aparamList  ::= type , aparamList
-            ::= type
+pgm         ::= stms 
+stms        ::= stm . 
+            ::= stm ; stms 
+stm         ::= expr 
+expr        ::= NUMBER {pushn} 
+            ::= funcall 
+            ::= varuse 
+            ::= lambda 
+funcall     ::= NAME argList 
+            ::= ( expr ) argList 
+argList     ::= ( ) 
+            ::= ( args ) 
+args        ::= expr , args 
+            ::= expr 
+varuse      ::= NAME 
+lambda      ::= captureList paramList -> type stms 
+captureList ::= [ ] 
+            ::= [ captures ] 
+captures    ::= NAME , captures 
+            ::= NAME 
+paramlist   ::= ( ) 
+            ::= ( params ) 
+paramList   ::= param , params 
+            ::= param 
+param       ::= NAME : type 
+type        ::= INTEGER 
+            ::= aparamList -> type 
+aparamList  ::= ( ) 
+            ::= ( aparamList ) 
+aparams     ::= type , aparams 
+            ::= type 
 </textarea>
 <button class="jAdd">Add</button>
 <button class="jEditAll">Edit All</button>
