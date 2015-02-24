@@ -44,6 +44,14 @@
     </div>
 {{/rules}}
 </script>
+<script id="templ-tokens" type="text/html">
+<dl>
+{{#tokens}}
+	<dt>{{name}}</dt>
+	<dd>{{value}}</dd>
+{{/tokens}}
+</dl>
+</script>
 <script id="templ-edit" type="text/html">
     <div class="rule rule-{{ruleName}} edit head" id="rule-{{ruleName}}">
         <span class="name item">
@@ -58,6 +66,39 @@
         }}</span>
     </div>
 </script>
+<script id="default-syntax" type="text/x-syntax">
+pgm         ::= {begin-stack} {begin-symboltbl} stms {end-symboltbl} {result[$0]} {end-stack} 
+stms        ::= stm . 
+            ::= stm {stack-pop} ; stms 
+stm         ::= expr 
+expr        ::= NUMBER {stack-pushnumber[$]} 
+            ::= funcall 
+            ::= varuse 
+            ::= lambda 
+funcall     ::= NAME {symboltbl-check[$0]} {begin-call} argList {call-named[$0]} {end-call} 
+            ::= ( expr ) {begin-call} argList {call-stack} {end-call} 
+argList     ::= ( ) 
+            ::= ( args ) 
+args        ::= expr , args 
+            ::= expr {call-push[stack]} 
+varuse      ::= NAME {symboltbl-check[$]} {stack-pushnamed[symboltbl]} 
+lambda      ::= captureList paramList {begin-symboltbl[lambda]} -> type {lambda-type[$]} {begin-jmp} stms {jmp-here} {end-jmp} 
+captureList ::= [ {begin-lambda} ] 
+            ::= [ {begin-lambda} captures ] 
+captures    ::= NAME {lambda-add-capture[$]} , captures 
+            ::= NAME {lambda-add-capture[$]} 
+paramlist   ::= ( ) 
+            ::= ( params ) 
+paramList   ::= param , params 
+            ::= param 
+param       ::= NAME {lambda-add-param[$]} : type {lambda-param-type[type]} {end-type} 
+type        ::= NUMBER {begin-type[$]} 
+            ::= aparamList -> type {signature-type[type]} {end-type} {begin-type[signature]} {end-signature} 
+aparamList  ::= ( {begin-signature} ) 
+            ::= ( {begin-signature} aparamList ) 
+aparams     ::= type {signature-add[type]} {end-type} , aparams 
+            ::= type {signature-add[type]} {end-type} 
+</script>
 <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
 <script src="https://raw.githubusercontent.com/jonnyreeves/jquery-Mustache/master/jquery.mustache.js"></script>
 <script src="https://raw.github.com/janl/mustache.js/master/mustache.js"></script>
@@ -66,6 +107,8 @@ $(function(){
     'use strict'
     $.Mustache.addFromDom('templ-output');
     $.Mustache.addFromDom('templ-edit');
+    $.Mustache.addFromDom('templ-tokens');
+    var foundTokens = {};
 
     function makeRuleDefinition(ruleDef){
         return ruleDef.split(' ').map(function(ruleItem){
@@ -88,6 +131,7 @@ $(function(){
                     item: ruleItem,
                 };
             } 
+            foundTokens[ruleItem] = (foundTokens[ruleItem]||0)+1;
             return {
                 link: '#term-'+ruleItem,
                 'class': 'terminal',
@@ -106,7 +150,7 @@ $(function(){
 
     $('.jAdd').click(function(){
         var even = true;
-        var bruteText = $('#input').val();
+        var bruteText = $('#input').val()||$('#default-syntax').text();
         var lines = bruteText.split('\n');
         var oldRuleName = '';
         var rules = lines.filter(function(cline){
@@ -139,6 +183,7 @@ $(function(){
         $('.buttons').show();
         $('#output').mustache('templ-output', {rules:rules});
         resizeTextArea($('#input').val(''));
+        refreshTokens();
     });
     $('.jEditAll').click(function(){
         var spaces = 0;
@@ -173,6 +218,7 @@ $(function(){
         $('#input').val(input.slice(0, -1));
         $('#output').empty();
         resizeTextArea($('#input'));
+        refreshTokens();
     });
     $('.jToogle').click(function(){
         $('.semantic').toggle();
@@ -277,6 +323,26 @@ $(function(){
     	resizeTextArea($this);
     });
 
+    var meanings = {
+    	'NUMBER' : //,
+    };
+
+    function refreshTokens(){
+    	console.log(foundTokens);
+    	var tokens = [];
+    	for(var token in foundTokens){
+    		var value = '';
+    		if(token.toLowerCase() === token){
+    			value = '\\'+token;
+    		}
+    		tokens.push({
+    			name: token,
+    			value: value
+    		});
+    	}
+    	$('#tokens').mustache('templ-tokens', {tokens:tokens}, 'html');
+    }
+
     //Dirt trick
     $('.jAdd').click();
 })
@@ -290,40 +356,17 @@ $(function(){
 		<button class="jEditAll">Edit All</button>
 	</div>
 	<div id="output"></div>
-	<textarea id="input" placeholder="New Rules Here">
-pgm         ::= {begin-stack} {begin-symboltbl} stms {end-symboltbl} {result[$0]} {end-stack} 
-stms        ::= stm . 
-            ::= stm {stack-pop} ; stms 
-stm         ::= expr 
-expr        ::= NUMBER {stack-pushnumber[$]} 
-            ::= funcall 
-            ::= varuse 
-            ::= lambda 
-funcall     ::= NAME {symboltbl-check[$0]} {begin-call} argList {call-named[$0]} {end-call} 
-            ::= ( expr ) {begin-call} argList {call-stack} {end-call} 
-argList     ::= ( ) 
-            ::= ( args ) 
-args        ::= expr , args 
-            ::= expr {call-push[stack]} 
-varuse      ::= NAME {symboltbl-check[$]} {stack-pushnamed[symboltbl]} 
-lambda      ::= captureList paramList {begin-symboltbl[lambda]} -> type {lambda-type[$]} {begin-jmp} stms {jmp-here} {end-jmp} 
-captureList ::= [ {begin-lambda} ] 
-            ::= [ {begin-lambda} captures ] 
-captures    ::= NAME {lambda-add-capture[$]} , captures 
-            ::= NAME {lambda-add-capture[$]} 
-paramlist   ::= ( ) 
-            ::= ( params ) 
-paramList   ::= param , params 
-            ::= param 
-param       ::= NAME {lambda-add-param[$]} : type {lambda-param-type[type]} {end-type} 
-type        ::= NUMBER {begin-type[$]} 
-            ::= aparamList -> type {signature-type[type]} {end-type} {begin-type[signature]} {end-signature} 
-aparamList  ::= ( {begin-signature} ) 
-            ::= ( {begin-signature} aparamList ) 
-aparams     ::= type {signature-add[type]} {end-type} , aparams 
-            ::= type {signature-add[type]} {end-type} 
-	</textarea>
+	<textarea id="input" placeholder="New Rules Here"></textarea>
 	<button class="jAdd">Add</button>
+</section>
+<section id="lexer">
+	<h1>Tokens</h1>
+	<div id="tokens">
+		
+	</div>
+</section>
+<section id="semantic">
+	<h1>Semantics</h1>
 </section>
 </body>
 </html>
