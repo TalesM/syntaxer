@@ -76,7 +76,7 @@ body{font-family: sans-serif;}
     }}</span>
 </script>
 <script id="default-syntax" type="text/x-syntax">
-pgm         ::= {begin-stack} {begin-symboltbl} stms {end-symboltbl} {result[$0]} {end-stack} 
+pgm         ::= {begin-stack} {begin-symboltbl} stms {end-symboltbl} {stack-result} {end-stack} 
 stms        ::= stm . 
             ::= stm {stack-pop} ; stms 
 stm         ::= expr 
@@ -84,7 +84,7 @@ expr        ::= NUMBER {stack-pushnumber[$]}
             ::= funcall 
             ::= varuse 
             ::= lambda 
-funcall     ::= NAME {symboltbl-check[$0]} {begin-call} argList {call-named[$0]} {end-call} 
+funcall     ::= NAME {symboltbl-check[$]} {begin-call} argList {call-named[$]} {end-call} 
             ::= ( expr ) {begin-call} argList {call-stack} {end-call} 
 argList     ::= ( ) 
             ::= ( args ) 
@@ -347,6 +347,68 @@ $(function(){
             $extraTokens.append('<span id="rule-'+token+'">'+token+'</span>');
         }
     }
+    $('.export-json').click(function(event) {
+        'use strict'
+        //event.preventDefault();
+        /* Act on the event */
+        var productions = {};
+        var terminals = {};
+        var $output = $('#output');
+        var start = $output.find('.rule.head:first .name').text().trim();
+        var initialization = [];
+        $output.find('.rule.head').each(function(index, el) {
+            var $this = $(this);
+            var name = $this.find('.name').text().trim();
+            var initial = name[0];
+            if(initial == initial.toUpperCase()){
+                terminals[name] = $this.find('.definition').text().trim();
+            } else {
+                var variants = [];
+                $output.find('.rule-'+name).each(function() {
+                    var items = [];
+                    $(this).find('.def-item').each(function() {
+                        var $item = $(this);
+                        if($item.hasClass('semantic')){
+                            var text = $item.text().trim();
+                            var matches = text.match(/\{(?:(begin|end)\-)?([\w\d_]+)?(?:-([\w\d_-]+))?(\[(\$|[\w\d_]+)\])?\}/);
+                            if(!matches){
+                                throw new Error('Wrong Format:'+text);
+                            }
+                            var call = {
+                                type:   matches[1]||'call',
+                                object: matches[2],
+                                action: matches[3]||null,
+                                param:  matches[4]?(matches[5]=='$'?true:matches[5]):(false)
+                            };
+                            if(items.length){
+                                var last = items[items.length-1]; 
+                                last.actions.push(call);
+                            } else if(name === start){
+                                initialization.push(call);
+                            } else {
+                                throw new Error('invalid semantic location');
+                            }
+                        }else {
+                            items.push({
+                                item: $item.text().trim(),
+                                actions: []
+                            }); 
+                        }
+                    });
+                    variants.push(items);
+                });
+                productions[name] = variants;
+            }
+        });
+        var result = {
+            productions: productions,
+            terminals: terminals,
+            start: start,
+            initialization: initialization
+        };
+        this.href = 'data:,'+JSON.stringify(result);
+        //return false;
+    });
 
     //Dirt trick
     $('.jAdd').click();
@@ -365,6 +427,10 @@ $(function(){
     <button class="jAdd">Add</button>
     <h2>Extra Tokens</h2>
     <div class="extra-tokens">
+    </div>
+    <h2>Export</h2>
+    <div class="buttons">
+        <a class="export-json" download="export.json" href>Export JSON</a>
     </div>
 </section>
 <section id="semantic">
