@@ -26,94 +26,9 @@ body{font-family: sans-serif;}
 .extra-tokens span:nth-child(2n) {background: #eee;}
 .extra-tokens span:target {background: black; color: white;}
 </style>
-<script id="templ-output" type="text/html">
-{{#rules}}
-    <div class="rule rule-{{ruleName}} {{#even}}even{{/even}} 
-{{#newRule}}head{{/newRule}} {{classes}}" id="rule-{{ruleName}}">
-        <span class="name item {{^newRule}}repetition{{/newRule}}">
-            {{ruleName}}
-        </span>
-        <span class="definition item">
-            {{#ruleDef}}
-                {{#link}}
-                    <a href="{{link}}" class="def-item {{classes}}">
-                        {{item}}
-                    </a>
-                {{/link}}
-                {{^link}}
-                    <span class="def-item {{classes}}">
-                        {{item}}
-                    </span>
-                {{/link}}
-            {{/ruleDef}}
-        </span>
-        {{#newRule}}
-        <span class="buttons item">{{!
-            }}<span class="button jEdit">E</span>{{!
-            }}<span class="button jUp">&uparrow;</span>{{!
-            }}<span class="button jDown">&downarrow;</span>{{!
-            }}<span class="button jDelete">&times;</span>{{!
-        }}</span>
-        {{/newRule}}
-    </div>
-{{/rules}}
-</script>
-<script id="templ-tokens" type="text/html">
-<dl>
-{{#tokens}}
-    <dt>{{name}}</dt>
-    <dd>{{value}}</dd>
-{{/tokens}}
-</dl>
-</script>
-<script id="templ-edit" type="text/html">
-    <span class="definition item">
-        <textarea class="value">{{value}}</textarea>
-    </span>
-    <span class="buttons item">{{!
-        }}<span class="button jOkEdit">&radic;</span>{{!
-        }}<span class="button jResetEdit">R</span>{{!
-    }}</span>
-</script>
-<script id="default-syntax" type="text/x-syntax">
-pgm         ::= {begin-stack} {begin-symboltbl} stms {end-symboltbl} {stack-result} {end-stack} 
-stms        ::= stm . 
-            ::= stm {stack-pop} ; stms 
-stm         ::= expr 
-expr        ::= NUMBER {stack-pushnumber[$]} 
-            ::= funcall 
-            ::= varuse 
-            ::= lambda 
-funcall     ::= NAME {symboltbl-check[$]} {begin-call} argList {call-named[$]} {end-call} 
-            ::= ( expr ) {begin-call} argList {call-stack} {end-call} 
-argList     ::= ( ) 
-            ::= ( args ) 
-args        ::= expr , args 
-            ::= expr {call-push[stack]} 
-varuse      ::= NAME {symboltbl-check[$]} {stack-pushnamed[symboltbl]} 
-lambda      ::= captureList paramList {begin-symboltbl[lambda]} -> type {lambda-type[$]} {begin-jmp} stms {jmp-here} {end-jmp} 
-captureList ::= [ {begin-lambda} ] 
-            ::= [ {begin-lambda} captures ] 
-captures    ::= NAME {lambda-add-capture[$]} , captures 
-            ::= NAME {lambda-add-capture[$]} 
-paramlist   ::= ( ) 
-            ::= ( params ) 
-paramList   ::= param , params 
-            ::= param 
-param       ::= NAME {lambda-add-param[$]} : type {lambda-param-type[type]} {end-type} 
-type        ::= NUMBER {begin-type[$]} 
-            ::= aparamList -> type {signature-type[type]} {end-type} {begin-type[signature]} {end-signature} 
-aparamList  ::= ( {begin-signature} ) 
-            ::= ( {begin-signature} aparamList ) 
-aparams     ::= type {signature-add[type]} {end-type} , aparams 
-            ::= type {signature-add[type]} {end-type} 
-NAME        ::= /([\w_][\w_\d]*)/
-NUMBER      ::= /([\d][_\d]*)/
-</script>
 <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
 <script src="https://raw.githubusercontent.com/jonnyreeves/jquery-Mustache/master/jquery.mustache.js"></script>
 <script src="https://raw.github.com/janl/mustache.js/master/mustache.js"></script>
-<!-- <script src="Sintaxer.js"></script> -->
 <script data-main="sintaxer" src="require.js"></script>
 </head>
 <body>
