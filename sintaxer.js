@@ -1,46 +1,96 @@
-require(['text!syntax.html', 'text!edit.html', 'text!model.syntax'], function function_name (templOutput, templEdit, modelSyntax) {
-    // body...
+require(['SyntaxParser','text!syntax.html', 'text!edit.html', 'text!model.syntax'], function function_name (syntaxParser, templOutput, templEdit, modelSyntax) {
+    var foundTokens = {};
+    function TemplGenerator () {
+        //token
+        this.productionToken = function (token) {
+            return {
+                link: '#rule-'+token,
+                classes: 'production',
+                item: token,
+            };
+        };
+        this.semanticToken = function (processedToken, token) {
+            return {
+                link: '#func-'+token,
+                classes: 'semantic',
+                item: token,
+            };
+        };
+        this.regexToken = function(_, token) {
+            return {
+                classes: 'regex',
+                item: token,
+            };
+        };
+        this.terminalToken = function(_, token) {
+            foundTokens[token] = (foundTokens[token]||0)+1;
+            return {
+                link: '#rule-'+token,
+                classes: 'terminal',
+                item: token,
+            };
+        };
+
+        //definition
+        this.startDefinition = function() {
+            return [];
+        };
+        this.addToken = function (tokens, token) {
+            tokens.push(token);
+            return tokens;
+        };
+        this.generateDefinition = function (tokens) {
+            return tokens;
+        };
+
+        var even = true;
+        var ruleName;
+        this.startRule = function(name) {
+            ruleName = name;
+            return [];
+        };
+        this.addDefinition = function(definitions, definition) {
+            definitions.push({
+                ruleName:ruleName,
+                even: even,
+                newRule: !definitions.length,
+                ruleDef: definition,
+            });
+            return definitions;
+        };
+        this.generateRule = function(definitions) {
+            even = !even;
+            return definitions;
+        }
+
+        //Syntax
+        this.startSyntax = function() {
+            return [];
+        };
+        this.addRule = function (rules, rule) {
+            return rules.concat(rule);
+        }
+        this.generateSyntax = function(rules) {
+            return rules;
+        }
+    };
+
+    var templGenerator = new TemplGenerator();
+    function refreshExtraTokens(){
+        var $extraTokens = $('.extra-tokens').empty();
+        for(var token in foundTokens){
+            if(document.getElementById('rule-'+token)){
+                continue;
+            }
+            $extraTokens.append('<span id="rule-'+token+'">'+token+'</span>');
+        }
+    }
+    
     $(function(){
         'use strict'
         $.Mustache.add('templ-output', templOutput);
         $.Mustache.add('templ-edit', templEdit);
-        var foundTokens = {};
 
-        function makeRuleDefinition(ruleDef){
-            return ruleDef.split(' ').map(function(ruleItem){
-                return ruleItem.trim();
-            }).filter(function(ruleItem){
-                return ruleItem.length;
-            }).map(function(ruleItem){
-                if(ruleItem[0] !== ruleItem[0].toUpperCase()){
-                    return {
-                        link: '#rule-'+ruleItem,
-                        classes: 'production',
-                        item: ruleItem,
-                    };
-                } 
-                if(ruleItem[0]=== '{' 
-                   && ruleItem[ruleItem.length-1]==='}'){
-                    return {
-                        link: '#func-'+ruleItem,
-                        classes: 'semantic',
-                        item: ruleItem,
-                    };
-                }
-                if(ruleItem[0]=== '/' && ruleItem[ruleItem.length-1]==='/'){
-                    return {
-                        classes: 'regex',
-                        item: ruleItem,
-                    };
-                }
-                foundTokens[ruleItem] = (foundTokens[ruleItem]||0)+1;
-                return {
-                    link: '#rule-'+ruleItem,
-                    classes: 'terminal',
-                    item: ruleItem,
-                };
-            });
-        }
 
         function disassembleRuleDefinition($this){
             if($this.is('.terminal')){
@@ -52,35 +102,7 @@ require(['text!syntax.html', 'text!edit.html', 'text!model.syntax'], function fu
         $('.jAdd').click(function(){
             var even = true;
             var bruteText = $('#input').val()||modelSyntax;
-            var lines = bruteText.split('\n');
-            var oldRuleName = '';
-            var rules = lines.filter(function(cline){
-                if(!cline || cline[0]==='#'){
-                    return false;
-                }
-                var pos = cline.indexOf('::=');
-                if(pos === -1 || cline.indexOf('::=', pos+1) !== -1){
-                    return false;
-                }
-                return true;
-            }).map(function(cline){
-                var line = cline.split('::=');
-                var ruleName = line[0].trim();
-                var ruleDef = makeRuleDefinition(line[1].trim());
-                var newRule = ruleName && ruleName !== oldRuleName;
-                if(newRule){
-                    even = !even;
-                    oldRuleName = ruleName;
-                }else {
-                    ruleName = oldRuleName;
-                }
-                return {
-                    ruleName:ruleName,
-                    even: even,
-                    newRule: newRule,
-                    ruleDef: ruleDef,
-                };
-            });
+            var rules = syntaxParser.parse(bruteText, templGenerator);
             $('.buttons').show();
             $('#output').mustache('templ-output', {rules:rules});
             resizeTextArea($('#input').val(''));
@@ -202,7 +224,7 @@ require(['text!syntax.html', 'text!edit.html', 'text!model.syntax'], function fu
                         ruleName: name,
                         even: $editRule.data('even'),
                         newRule: i==0,
-                        ruleDef: makeRuleDefinition(ruleDef),
+                        ruleDef: syntaxParser.parseDefinition(ruleDef, templGenerator),
                     };
                 })
             }));
@@ -222,18 +244,6 @@ require(['text!syntax.html', 'text!edit.html', 'text!model.syntax'], function fu
             var $this = $(this);
             resizeTextArea($this);
         });
-
-        function refreshExtraTokens(){
-            var $extraTokens = $('.extra-tokens').empty();
-            for(var token in foundTokens){
-                if(document.getElementById('rule-'+token)){
-                    continue;
-                }
-                $extraTokens.append('<span id="rule-'+token+'">'+token+'</span>');
-            }
-        }
-
-        
 
         $('.export-json').click(function(event) {
             'use strict'
