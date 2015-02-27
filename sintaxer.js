@@ -1,6 +1,9 @@
 require(['SyntaxParser','text!syntax.html', 'text!edit.html', 'text!model.syntax'], function function_name (syntaxParser, templOutput, templEdit, modelSyntax) {
     var foundTokens = {};
     function TemplGenerator () {
+        this.foundTokens = function () {
+            return foundTokens;
+        }
         //token
         this.productionToken = function (token) {
             return {
@@ -78,7 +81,7 @@ require(['SyntaxParser','text!syntax.html', 'text!edit.html', 'text!model.syntax
     var templGenerator = new TemplGenerator();
     function refreshExtraTokens(){
         var $extraTokens = $('.extra-tokens').empty();
-        for(var token in foundTokens){
+        for(var token in templGenerator.foundTokens()){
             if(document.getElementById('rule-'+token)){
                 continue;
             }
