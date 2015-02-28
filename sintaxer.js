@@ -1,110 +1,34 @@
-require(['SyntaxParser','text!syntax.html', 'text!edit.html', 'text!model.syntax'], function function_name (syntaxParser, templOutput, templEdit, modelSyntax) {
-    var foundTokens = {};
-    function TemplGenerator () {
-        this.foundTokens = function () {
-            return foundTokens;
-        }
-        //token
-        this.productionToken = function (token) {
-            return {
-                link: '#rule-'+token,
-                classes: 'production',
-                item: token,
-            };
-        };
-        this.semanticToken = function (processedToken, token) {
-            return {
-                link: '#func-'+token,
-                classes: 'semantic',
-                item: token,
-            };
-        };
-        this.regexToken = function(_, token) {
-            return {
-                classes: 'regex',
-                item: token,
-            };
-        };
-        this.terminalToken = function(_, token) {
-            foundTokens[token] = (foundTokens[token]||0)+1;
-            return {
-                link: '#rule-'+token,
-                classes: 'terminal',
-                item: token,
-            };
-        };
-
-        //definition
-        this.startDefinition = function() {
-            return [];
-        };
-        this.addToken = function (tokens, token) {
-            tokens.push(token);
-            return tokens;
-        };
-        this.generateDefinition = function (tokens) {
-            return tokens;
-        };
-
-        var even = true;
-        var ruleName;
-        this.startRule = function(name) {
-            ruleName = name;
-            return [];
-        };
-        this.addDefinition = function(definitions, definition) {
-            definitions.push({
-                ruleName:ruleName,
-                even: even,
-                newRule: !definitions.length,
-                ruleDef: definition,
-            });
-            return definitions;
-        };
-        this.generateRule = function(definitions) {
-            even = !even;
-            return definitions;
-        }
-
-        //Syntax
-        this.startSyntax = function() {
-            return [];
-        };
-        this.addRule = function (rules, rule) {
-            return rules.concat(rule);
-        }
-        this.generateSyntax = function(rules) {
-            return rules;
-        }
-    };
-
-    var templGenerator = new TemplGenerator();
-    function refreshExtraTokens(){
-        var $extraTokens = $('.extra-tokens').empty();
-        for(var token in templGenerator.foundTokens()){
-            if(document.getElementById('rule-'+token)){
-                continue;
-            }
-            $extraTokens.append('<span id="rule-'+token+'">'+token+'</span>');
-        }
-    }
-    
+require(['SyntaxParser', 'TemplGenerator', 'text!syntax.html', 'text!edit.html', 'text!model.syntax'], function (syntaxParser, TemplGenerator, templOutput, templEdit, modelSyntax) {
     $(function(){
         'use strict'
+
         $.Mustache.add('templ-output', templOutput);
         $.Mustache.add('templ-edit', templEdit);
-
-
-        function disassembleRuleDefinition($this){
-            if($this.is('.terminal')){
-                --foundTokens[$this.text().trim()];
+        var foundTokens = {};
+        var templGenerator = new TemplGenerator(foundTokens);
+        function refreshExtraTokens(){
+            var $extraTokens = $('.extra-tokens').empty();
+            for(var token in foundTokens){
+                if(document.getElementById('rule-'+token) || foundTokens[token] <= 0){
+                    continue;
+                }
+                $extraTokens.append('<span id="rule-'+token+'">'+token+'</span>');
             }
-            return $this.text().trim() + ' ';
+        }
+
+
+        function disassembleRuleDefinition($item){
+            if($item.is('.terminal')){
+                --foundTokens[$item.text().trim()];
+            }
+            return $item.text().trim() + ' ';
         }
 
         $('.jAdd').click(function(){
             var even = true;
-            var bruteText = $('#input').val()||modelSyntax;
+            var bruteText = $('#input').val().trim();
+            if(!bruteText)
+                return;
             var rules = syntaxParser.parse(bruteText, templGenerator);
             $('.buttons').show();
             $('#output').mustache('templ-output', {rules:rules});
@@ -151,11 +75,6 @@ require(['SyntaxParser','text!syntax.html', 'text!edit.html', 'text!model.syntax
         function getRuleClass($button){
             return '.' + $button.closest('.rule').attr('id');
         }
-        $('#output').on('click', '.jDelete', function(){
-            var $this = $(this);
-            $this.closest('.rule').nextAll().toggleClass('even');
-            $(getRuleClass($this)).remove();
-        });
         $('#output').on('click', '.jUp', function(){
             var $currentHead = $(this).closest('.rule');
             var $current = $(getRuleClass($currentHead));
@@ -192,7 +111,6 @@ require(['SyntaxParser','text!syntax.html', 'text!edit.html', 'text!model.syntax
                 newVal += '\n';
                 lineCount ++;
             });
-
             
             var $currentHead = $current.first();
             $currentHead.find(':not(.name)').remove();
@@ -204,6 +122,15 @@ require(['SyntaxParser','text!syntax.html', 'text!edit.html', 'text!model.syntax
 
             resizeTextArea($currentHead.find('textarea'));
         });
+        $('#output').on('click', '.jDelete', function(){
+            var $this = $(getRuleClass($(this)));
+            $this.find('.def-item').each(function () {
+                disassembleRuleDefinition($(this))
+            })
+            $this.nextAll().toggleClass('even');
+            $this.remove();
+            refreshExtraTokens();
+        });
 
         $('#output').on('click', '.jResetEdit', function(){
             var $value = $(this).closest('.rule').find('.value');
@@ -212,25 +139,30 @@ require(['SyntaxParser','text!syntax.html', 'text!edit.html', 'text!model.syntax
         $('#output').on('click', '.jOkEdit', function(){
             var $editRule = $(this).closest('.rule');
             var $value = $editRule.find('.value');
-            var newVal = $value.val();
+            var newVal = $value.val().trim();
             var name = $editRule.find('.name').text().trim();
-            $editRule.before($.Mustache.render('templ-output', {
-                rules: newVal.split('\n').map(function(v){
-                    return v.trim();
-                }).filter(function(cline){
-                    if(!cline.trim() || cline[0]==='#'){
-                        return false;
-                    }
-                    return true;
-                }).map(function(ruleDef, i){
-                    return {
-                        ruleName: name,
-                        even: $editRule.data('even'),
-                        newRule: i==0,
-                        ruleDef: syntaxParser.parseDefinition(ruleDef, templGenerator),
-                    };
-                })
-            }));
+            var rules = newVal.split('\n').map(function(v){
+                return v.trim();
+            }).filter(function(cline){
+                if(!cline.trim() || cline[0]==='#'){
+                    return false;
+                }
+                return true;
+            }).map(function(ruleDef, i){
+                return {
+                    ruleName: name,
+                    even: $editRule.data('even'),
+                    newRule: i==0,
+                    ruleDef: syntaxParser.parseDefinition(ruleDef, templGenerator),
+                };
+            });
+            if(rules.length){
+                $editRule.before($.Mustache.render('templ-output', {
+                    rules: rules
+                }));
+            } else {
+                $editRule.nextAll().toggleClass('even');
+            }
             $editRule.remove();
             refreshExtraTokens();
         });
@@ -312,6 +244,7 @@ require(['SyntaxParser','text!syntax.html', 'text!edit.html', 'text!model.syntax
         });
 
         //Dirt trick
+        $('#input').val($('#input').val()||modelSyntax);
         $('.jAdd').click();
     });
 });
