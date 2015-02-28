@@ -6,7 +6,6 @@
 <style>
 body{font-family: sans-serif;}
 #output {display: table; width: 100%}
-#output:empty::before {content: 'Loading, please wait...'}
 .rule {display: table-row; font-family: monospace}
 .rule:target .name {background: black; color: white;}
 .rule .item{display: table-cell}
@@ -15,6 +14,7 @@ body{font-family: sans-serif;}
 .name{padding-right: 0.25em; vertical-align: top;}
 .name.repetition{color:#aaa}
 .def-item{padding-left: 0.25em; text-decoration: none}
+.semantic + .semantic {color: brown;}
 .even{background: #eee}
 .terminal{color:green}
 .production{color:blue}

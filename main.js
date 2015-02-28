@@ -1,11 +1,52 @@
 require(['SyntaxParser', 'TemplGenerator', 'text!syntax.html', 'text!edit.html', 'text!model.syntax'], function (syntaxParser, TemplGenerator, templOutput, templEdit, modelSyntax) {
-    $(function(){
-        'use strict'
+    'use strict'
+    function parseToken ($token, generator) {
+        var text = $token.text().trim();
+        if($token.is('.production')){
+            return generator.productionToken(text, text);
+        }
+        if($token.is('.semantic')){
+            return generator.semanticToken(text, text);
+        }
+        if($token.is('.regex')){
+            return generator.regexToken(text.slice(1, -1), text);
+        }
+        if($token.is('.terminal')){
+            return generator.terminalToken(text.toLowerCase(), text);
+        }
+    }
+    var domParser = {
+        parseToken: parseToken,
+    };
 
+    function TextGenerator (foundTokens) {
+        this.productionToken = function (token) {
+            return token + ' ';
+        }
+
+        this.semanticToken = function (token) {
+            return '{'+token+'} ';
+        }
+
+        this.regexToken = function (token) {
+            return '/'+token+'/ ';
+        }
+
+        this.terminalToken = function (token) {
+            token = token.toUpperCase();
+            if(foundTokens[token]){
+                --foundTokens[token];
+            }
+            return token + ' ';
+        }
+    }
+
+    $(function(){
         $.Mustache.add('templ-output', templOutput);
         $.Mustache.add('templ-edit', templEdit);
         var foundTokens = {};
         var templGenerator = new TemplGenerator(foundTokens);
+        var textGenerator = new TextGenerator(foundTokens);
         function refreshExtraTokens(){
             var $extraTokens = $('.extra-tokens').empty();
             for(var token in foundTokens){
@@ -18,10 +59,7 @@ require(['SyntaxParser', 'TemplGenerator', 'text!syntax.html', 'text!edit.html',
 
 
         function disassembleRuleDefinition($item){
-            if($item.is('.terminal')){
-                --foundTokens[$item.text().trim()];
-            }
-            return $item.text().trim() + ' ';
+            return domParser.parseToken($item, textGenerator);
         }
 
         $('.jAdd').click(function(){

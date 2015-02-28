@@ -13,9 +13,9 @@ define(function function_name () {
         };
         this.semanticToken = function (processedToken, token) {
             return {
-                link: '#func-'+token,
+                link: '#func-'+processedToken,
                 classes: 'semantic',
-                item: token,
+                item: processedToken,
             };
         };
         this.regexToken = function(_, token) {
