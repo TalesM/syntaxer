@@ -95,7 +95,7 @@ define(function () {
             return rules;
         }
         this.addTerminal = function(rules, terminalName, terminalRegex) {
-            rules.terminals[terminalName] = terminalRegex;
+            rules.terminals[terminalName.toUpperCase()] = terminalRegex;
             return rules;
         };
         this.generate = function(rules) {

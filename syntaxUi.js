@@ -1,15 +1,13 @@
-define(['SyntaxParser', 'DomParser', 'TextGenerator', 'TemplGenerator', 'JsonGenerator', 'text!syntax.html', 'text!edit.html', 'text!model.syntax', 'domReady!'], 
-function(syntaxParser,   domParser,   TextGenerator,   TemplGenerator,   JsonGenerator ,  templOutput,        templEdit,        modelSyntax,         doc) {
+define(['SyntaxParser', 'DomParser', 'TextGenerator', 'TemplGenerator', 'utility', 'domReady!'], 
+function(syntaxParser,   domParser,   TextGenerator,   TemplGenerator,   utility ,  doc) {
 	'use strict'
-    $.Mustache.add('templ-output', templOutput);
-    $.Mustache.add('templ-edit', templEdit);
     var foundTokens = {};
     var templGenerator = new TemplGenerator(foundTokens);
     var textGenerator = new TextGenerator(foundTokens);
     
     /**
      * Refresh extra tokens on GUI
-     * @return {[type]}
+     * @return {undefined}
      */
     function refreshExtraTokens(){
         var $extraTokens = $('.extra-tokens').empty();
@@ -30,21 +28,6 @@ function(syntaxParser,   domParser,   TextGenerator,   TemplGenerator,   JsonGen
         return '.' + $button.closest('.rule').attr('id');
     }
 
-    /**
-     * Resize the text area to aways fit the content.  
-     * @param  {jQuery}
-     * @return {undefined}
-     */
-    function resizeTextArea($textarea){
-        var lines = $textarea.val().split('\n');
-        var nrows = lines.length;
-        var ncols = lines.reduce(function(prev, curr){
-            return Math.max(prev, curr.length);
-        }, 0);
-        $textarea.attr('rows', Math.max(1, nrows-1));
-        $textarea.attr('cols', Math.max(ncols, 40));
-    }
-
     $('.jAdd').click(function(){
         var even = true;
         var bruteText = $('#input').val().trim();
@@ -53,7 +36,7 @@ function(syntaxParser,   domParser,   TextGenerator,   TemplGenerator,   JsonGen
         var rules = syntaxParser.parse(bruteText, templGenerator);
         $('.buttons').show();
         $('#output').mustache('templ-output', {rules:rules});
-        resizeTextArea($('#input').val(''));
+        utility.resizeTextArea($('#input').val(''));
         refreshExtraTokens();
     });
     $('.jEditAll').click(function(){
@@ -70,7 +53,7 @@ function(syntaxParser,   domParser,   TextGenerator,   TemplGenerator,   JsonGen
         $('.buttons').hide();
         $('#input').val(input);
         $('#output').empty();
-        resizeTextArea($('#input'));
+        utility.resizeTextArea($('#input'));
     });
     $('.jToogle').click(function(){
         $('.semantic').toggle();
@@ -128,7 +111,7 @@ function(syntaxParser,   domParser,   TextGenerator,   TemplGenerator,   JsonGen
                     .data('production', isProduction);
         $current.not($currentHead).remove();
 
-        resizeTextArea($currentHead.find('textarea'));
+        utility.resizeTextArea($currentHead.find('textarea'));
     });
     $('#output').on('click', '.jDelete', function(){
         var $this = $(getRuleClass($(this)));
@@ -192,19 +175,6 @@ function(syntaxParser,   domParser,   TextGenerator,   TemplGenerator,   JsonGen
     });
     $('body').on('input', 'textarea', function(){
         var $this = $(this);
-        resizeTextArea($this);
+        utility.resizeTextArea($this);
     });
-
-    $('.export-json').click(function(event) {
-        'use strict'
-        //event.preventDefault();
-        /* Act on the event */
-        var result = domParser.parse($(output), new JsonGenerator());
-        this.href = 'data:,'+JSON.stringify(result);
-        //return false;
-    });
-
-    //Dirt trick
-    $('#input').val($('#input').val()||modelSyntax);
-    $('.jAdd').click();
 })
