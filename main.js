@@ -1,5 +1,5 @@
-require(['SyntaxParser', 'TemplGenerator', 'DomParser', 'TextGenerator', 'text!syntax.html', 'text!edit.html', 'text!model.syntax', 'domReady!'], 
-function (syntaxParser,   TemplGenerator,   domParser,   TextGenerator,   templOutput,        templEdit,        modelSyntax,         doc) {
+require(['SyntaxParser', 'DomParser', 'TextGenerator', 'TemplGenerator', 'JsonGenerator', 'text!syntax.html', 'text!edit.html', 'text!model.syntax', 'domReady!'], 
+function (syntaxParser,   domParser,   TextGenerator,   TemplGenerator,   JsonGenerator ,  templOutput,        templEdit,        modelSyntax,         doc) {
     'use strict'
     $.Mustache.add('templ-output', templOutput);
     $.Mustache.add('templ-edit', templEdit);
@@ -182,61 +182,7 @@ function (syntaxParser,   TemplGenerator,   domParser,   TextGenerator,   templO
         'use strict'
         //event.preventDefault();
         /* Act on the event */
-        var productions = {};
-        var terminals = {};
-        var $output = $('#output');
-        var start = $output.find('.rule.head:first .name').text().trim();
-        var initialization = [];
-        $output.find('.rule.head').each(function(index, el) {
-            var $this = $(this);
-            var name = $this.find('.name').text().trim();
-            var initial = name[0];
-            if(initial == initial.toUpperCase()){
-                terminals[name] = $this.find('.definition').text().trim();
-            } else {
-                var variants = [];
-                $output.find('.rule-'+name).each(function() {
-                    var items = [];
-                    $(this).find('.def-item').each(function() {
-                        var $item = $(this);
-                        if($item.hasClass('semantic')){
-                            var text = $item.text().trim();
-                            var matches = text.match(/\{(?:(begin|end)\-)?([\w\d_]+)?(?:-([\w\d_-]+))?(\[(\$|[\w\d_]+)\])?\}/);
-                            if(!matches){
-                                throw new Error('Wrong Format:'+text);
-                            }
-                            var call = {
-                                type:   matches[1]||'call',
-                                object: matches[2],
-                                action: matches[3]||null,
-                                param:  matches[4]?(matches[5]=='$'?true:matches[5]):(false)
-                            };
-                            if(items.length){
-                                var last = items[items.length-1]; 
-                                last.actions.push(call);
-                            } else if(name === start){
-                                initialization.push(call);
-                            } else {
-                                throw new Error('invalid semantic location');
-                            }
-                        }else {
-                            items.push({
-                                item: $item.text().trim(),
-                                actions: []
-                            }); 
-                        }
-                    });
-                    variants.push(items);
-                });
-                productions[name] = variants;
-            }
-        });
-        var result = {
-            productions: productions,
-            terminals: terminals,
-            start: start,
-            initialization: initialization
-        };
+        var result = domParser.parse($(output), new JsonGenerator());
         this.href = 'data:,'+JSON.stringify(result);
         //return false;
     });
