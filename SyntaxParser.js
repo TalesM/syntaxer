@@ -1,4 +1,5 @@
 define(function() {
+    'use strict'
     function parseToken (token, generator) {
         if(token[0] !== token[0].toUpperCase()){
             return generator.productionToken(token, token)
