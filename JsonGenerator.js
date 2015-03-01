@@ -6,6 +6,7 @@ define(function () {
             return {
                 item: token,
                 actions: [],
+                terminal: false,
             };
         }
 
@@ -30,6 +31,7 @@ define(function () {
             return {
                 item: token,
                 actions: [],
+                terminal: true,
             };
         }
 
@@ -95,7 +97,7 @@ define(function () {
             return rules;
         }
         this.addTerminal = function(rules, terminalName, terminalRegex) {
-            rules.terminals[terminalName.toUpperCase()] = terminalRegex;
+            rules.terminals[terminalName] = terminalRegex;
             return rules;
         };
         this.generate = function(rules) {
