@@ -97,6 +97,10 @@ define(function () {
             return rules;
         }
         this.addTerminal = function(rules, terminalName, terminalRegex) {
+            if(!terminalRegex){
+                rules.terminals[terminalName] = true;
+                return rules;
+            }
             rules.terminals[terminalName] = terminalRegex;
             return rules;
         };

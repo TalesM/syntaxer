@@ -1,5 +1,6 @@
 define(function() {
     'use strict'
+    var tokens = {};
     function parseToken (token, generator) {
         if(token[0] !== token[0].toUpperCase()){
             return generator.productionToken(token)
@@ -11,6 +12,7 @@ define(function() {
         if(token[0]=== '/' && token[token.length-1]==='/'){
             return generator.regexToken(token.slice(1, -1));
         }
+        tokens[token] = tokens[token]||false;
         return generator.terminalToken(token.toLowerCase());
     }
 
@@ -27,6 +29,7 @@ define(function() {
     }
 
     function parse (text, generator) {
+        tokens = {};
         var lines = text.split('\n');
         var oldRuleName = '';
         var rules = generator.start();
@@ -73,6 +76,11 @@ define(function() {
         if(definitions){
             rules = generator.addProduction(rules, generator.generateProduction(definitions));
         }
+        Object.keys(tokens).forEach(function(token) {
+            if(!tokens[token]){
+                rules = generator.addTerminal(rules, token);
+            }
+        });
         return generator.generate(rules);
     }
     return {

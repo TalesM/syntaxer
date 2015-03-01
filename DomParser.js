@@ -1,5 +1,6 @@
 define(function () {
     'use strict'
+    var tokens = {};
 	function parseToken ($token, generator) {
         var text = $token.text().trim();
         if($token.is('.production')){
@@ -12,7 +13,9 @@ define(function () {
             return generator.regexToken(text);
         }
         if($token.is('.terminal')){
-            return generator.terminalToken(text.toLowerCase());
+            var token = text.toLowerCase();
+            tokens[token] = tokens[token]||false;
+            return generator.terminalToken(token);
         }
     }
 
@@ -26,6 +29,7 @@ define(function () {
     }
 
     function parse ($output, generator) {
+        tokens = {};
         var rules = generator.start();
         var oldName;
         var definitions;
@@ -41,7 +45,9 @@ define(function () {
                 if(name === name.toUpperCase()){
                     var token = parseToken($rule.find('.regex'), generator);
                     definitions = undefined;
-                    rules = generator.addTerminal(rules, name.toLowerCase(), token);
+                    var ruleName = name.toLowerCase();
+                    tokens[ruleName] = true;
+                    rules = generator.addTerminal(rules, ruleName, token);
                     return;
                 }
                 definitions = generator.startProduction(name);
@@ -52,6 +58,11 @@ define(function () {
         if(definitions){
             rules = generator.addProduction(rules, generator.generateProduction(definitions));
         }
+        Object.keys(tokens).forEach(function(token) {
+            if(!tokens[token]){
+                rules = generator.addTerminal(rules, token);
+            }
+        });
         return generator.generate(rules);
     }
     return {

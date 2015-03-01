@@ -75,6 +75,9 @@ define(function () {
             return rules + rule;
         }
         this.addTerminal = function(rules, terminalName, terminalRegex) {
+            if(!terminalRegex){
+                return rules;
+            }
             var relSpace = Math.max(0, spaces - terminalName.length);
             for (var i = 0; i < relSpace; i++) {
                 terminalName += ' ';
