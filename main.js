@@ -76,17 +76,30 @@ function (syntaxParser,   TemplGenerator,   domParser,   TextGenerator,   templO
     $('#output').on('click', '.jEdit', function(){
         var className = getRuleClass($(this));
         var $current = $(className);
-        var newVal = '';
-        $current.each(function(){
-            newVal += domParser.parseDefinition($(this), textGenerator) + '\n';
-        });
+        var newVal;
+
+        var isProduction = $current.is('.production');
+        if(isProduction){
+            var arrayVals = [];
+            $current.each(function(){
+                arrayVals.push(domParser.parseDefinition($(this), textGenerator));
+            });
+            newVal = arrayVals.join('\n');
+        } else {
+            console.log($current)
+            console.log($current.closest('.rule'));
+            console.log($current.closest('.rule').find('.regex'));
+            newVal = domParser.parseToken($current.closest('.rule').find('.regex'), textGenerator);
+        }
         
         var $currentHead = $current.first();
         $currentHead.children(':not(.name)').remove();
         $currentHead.mustache('templ-edit', {
-            value:newVal.slice(0, -1)
+            production:isProduction,
+            value:newVal
         });
-        $currentHead.data('even', $current.hasClass('even'));
+        $currentHead.data('even', $current.hasClass('even'))
+                    .data('production', isProduction);
         $current.not($currentHead).remove();
 
         resizeTextArea($currentHead.find('textarea'));
@@ -110,21 +123,37 @@ function (syntaxParser,   TemplGenerator,   domParser,   TextGenerator,   templO
         var $value = $editRule.find('.value');
         var newVal = $value.val().trim();
         var name = $editRule.find('.name').text().trim();
-        var rules = newVal.split('\n').map(function(v){
-            return v.trim();
-        }).filter(function(cline){
-            if(!cline.trim() || cline[0]==='#'){
-                return false;
-            }
-            return true;
-        }).map(function(ruleDef, i){
-            return {
+        var rules;
+        if($editRule.data('production')){
+            rules = newVal.split('\n').map(function(v){
+                return v.trim();
+            }).filter(function(cline){
+                if(!cline.trim() || cline[0]==='#'){
+                    return false;
+                }
+                return true;
+            }).map(function(ruleDef, i){
+                return {
+                    ruleName: name,
+                    ruleId: name,
+                    even: $editRule.data('even'),
+                    newRule: i==0,
+                    ruleDef: syntaxParser.parseDefinition(ruleDef, templGenerator),
+                    classes: 'production'
+                };
+            });
+        } else {
+
+            rules = [{
                 ruleName: name,
+                ruleId: name,
                 even: $editRule.data('even'),
-                newRule: i==0,
-                ruleDef: syntaxParser.parseDefinition(ruleDef, templGenerator),
-            };
-        });
+                newRule: true,
+                ruleDef: [syntaxParser.parseToken(newVal, templGenerator)],
+                classes: 'terminal'
+            }];
+        }
+        
         if(rules.length){
             $editRule.before($.Mustache.render('templ-output', {
                 rules: rules

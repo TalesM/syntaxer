@@ -54,9 +54,10 @@ define(function function_name () {
         };
         this.addDefinition = function(definitions, definition) {
             definitions.push({
-                ruleName:ruleName,
+                ruleName: ruleName,
+                ruleId: ruleName,
                 even: even,
-                newRule: !definitions.length?ruleName:false,
+                newRule: !definitions.length,
                 ruleDef: definition,
                 classes: 'production',
             });
@@ -77,8 +78,9 @@ define(function function_name () {
         this.addTerminal = function(rules, terminalName, terminalRegex) {
             rules.push({
                 ruleName: terminalName.toUpperCase(),
+                ruleId: terminalName,
                 even: even,
-                newRule: terminalName,
+                newRule: true,
                 ruleDef: [terminalRegex],
                 classes: 'terminal',
             });
