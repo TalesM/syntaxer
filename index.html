@@ -10,7 +10,8 @@ body{font-family: sans-serif;}
 .rule:target .name {background: black; color: white;}
 .rule .item{display: table-cell}
 .rule.edit{background: #ddd;}
-.definition::before{content: '::= '; vertical-align: top;}
+.production > .definition::before{content: '::= '; vertical-align: top; color: black;}
+.terminal > .definition::before{content: '<-- '; vertical-align: top; color: black;}
 .name{padding-right: 0.25em; vertical-align: top;}
 .name.repetition{color:#aaa}
 .def-item{padding-left: 0.25em; text-decoration: none}
@@ -20,7 +21,7 @@ body{font-family: sans-serif;}
 .production{color:blue}
 .semantic{color:red}
 .regex{color:darkgoldenrod;}
-#output .buttons{width: 5em; background: #eee;vertical-align: top;}
+#output .buttons{width: 5em; background: #eee; color: black;vertical-align: top;}
 #output .button{width:1em; border: 1px solid black;display:inline-block;cursor: pointer}
 .extra-tokens {font-family: monospace;}
 .extra-tokens span {display: inline-block; border: 1px solid #ccc;padding-right: 1em; width: 5em;}/*TODO: Some flex thing?*/

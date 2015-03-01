@@ -1,6 +1,7 @@
 {{#rules}}
     <div class="rule rule-{{ruleName}} {{#even}}even{{/even}} 
-{{#newRule}}head{{/newRule}} {{classes}}" id="rule-{{ruleName}}">
+{{#newRule}}head{{/newRule}} {{classes}}" 
+{{#newRule}}id="rule-{{newRule}}"{{/newRule}}>
         <span class="name item {{^newRule}}repetition{{/newRule}}">
             {{ruleName}}
         </span>
