@@ -23,11 +23,11 @@ paramlist   ::= ( )
 paramList   ::= param , params 
             ::= param 
 param       ::= NAME {lambda-add-param[$]} : type {lambda-param-type[type]} {end-type} 
-type        ::= NUMBER {begin-type[$]} 
+type        ::= INT {begin-type[$]} 
             ::= aparamList -> type {signature-type[type]} {end-type} {begin-type[signature]} {end-signature} 
 aparamList  ::= ( {begin-signature} ) 
             ::= ( {begin-signature} aparamList ) 
 aparams     ::= type {signature-add[type]} {end-type} , aparams 
             ::= type {signature-add[type]} {end-type} 
-NAME        <-- /([\w_][\w_\d]*)/
+NAME        <-- /([\w_][\w_\d])*/
 NUMBER      <-- /([\d][_\d]*)/

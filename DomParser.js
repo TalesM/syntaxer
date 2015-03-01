@@ -9,7 +9,7 @@ define(function () {
             return generator.semanticToken(text);
         }
         if($token.is('.regex')){
-            return generator.regexToken(text.slice(1, -1));
+            return generator.regexToken(text);
         }
         if($token.is('.terminal')){
             return generator.terminalToken(text.toLowerCase());
