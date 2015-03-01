@@ -25,24 +25,58 @@ require(['SyntaxParser', 'TemplGenerator', 'text!syntax.html', 'text!edit.html',
         return generator.generateDefinition(tokens);
     }
 
+    function parse ($output, generator) {
+        var rules = generator.startSyntax();
+        var oldName;
+        var definitions;
+        $output.children('.rule').each(function(){
+            var $rule = $(this);
+            var name = $rule.find('.name').text().trim();
+            if(name != oldName){
+                if(oldName){
+                    var rule = generator.generateRule(definitions);
+                    rules = generator.addRule(rules, rule);
+                }
+                oldName = name;
+                definitions = generator.startRule(name);
+            }
+            var definition = parseDefinition($rule, generator);
+            definitions = generator.addDefinition(definitions, definition);
+        });
+        rules = generator.addRule(rules, generator.generateRule(definitions));
+        return generator.generateSyntax(rules);
+    }
+
 
     var domParser = {
         parseToken: parseToken,
         parseDefinition: parseDefinition,
+        parse: parse,
     };
 
-    function TextGenerator (foundTokens) {
+    function TextGenerator (foundTokens, spaces) {
+        //Attrib
+        var freeSpace;
+        this.spaces = function (val) {
+            spaces = val;
+            freeSpace = '';
+            for (var i = 0; i < spaces; i++) {
+                freeSpace += ' ';
+            };
+        }
+        this.spaces(spaces||15)
+
         //Tokens
         this.productionToken = function (token) {
-            return token + ' ';
+            return token;
         }
 
         this.semanticToken = function (token) {
-            return '{'+token+'} ';
+            return '{'+token+'}';
         }
 
         this.regexToken = function (token) {
-            return '/'+token+'/ ';
+            return '/'+token+'/';
         }
 
         this.terminalToken = function (token) {
@@ -50,20 +84,55 @@ require(['SyntaxParser', 'TemplGenerator', 'text!syntax.html', 'text!edit.html',
             if(foundTokens[token]){
                 --foundTokens[token];
             }
-            return token + ' ';
+            return token;
         }
 
+        //Definitions
         this.startDefinition = function () {
             return '';
         }
 
         this.addToken = function (tokens, token) {
-            return tokens + token;
+            return tokens + token + ' ';
         }
 
         this.generateDefinition = function (tokens) {
-            return tokens + '\n';
+            return tokens;
         }
+
+        //Rules
+        var first = false;
+        this.startRule = function (ruleName) {
+            var relSpace = Math.max(0, spaces - ruleName.length)
+            for (var i = 0; i < relSpace; i++) {
+                ruleName += ' ';
+            };
+            first = true;
+            return ruleName;
+        }
+        this.addDefinition = function (definitions, definition) {
+            if(first){
+                first = false;
+                return definitions + '::= '+ definition + '\n';
+            }
+            return definitions + freeSpace + '::= '+ definition + '\n';
+        }
+
+        this.generateRule = function (definitions) {
+            return definitions;
+        }
+
+        //Syntax
+        this.startSyntax = function() {
+            return '';
+        };
+        this.addRule = function (rules, rule) {
+            return rules + rule;
+        }
+        this.generateSyntax = function(rules) {
+            return rules.slice(0, -1);
+        }
+
     }
 
     $(function(){
@@ -101,26 +170,11 @@ require(['SyntaxParser', 'TemplGenerator', 'text!syntax.html', 'text!edit.html',
                     spaces = length + 1;
                 }
             });
-            var input = '';
-            var oldName = '';
-            $('#output .rule').each(function(){
-                var $rule = $(this);
-                var name = $rule.find('.name').text().trim();
-                if(name != oldName){
-                    oldName = name;
-                    input += name;
-                }else {
-                    name = '';
-                }
-                var sz = spaces - name.length;
-                for(var i = 0; i < sz; ++i) {
-                    input += ' ';
-                }
-                input += '::= ';
-                input += domParser.parseDefinition($rule, textGenerator);
-            });    
+
+            textGenerator.spaces(spaces);
+            var input = domParser.parse($('#output'), textGenerator);
             $('.buttons').hide();
-            $('#input').val(input.slice(0, -1));
+            $('#input').val(input);
             $('#output').empty();
             resizeTextArea($('#input'));
         });
@@ -158,9 +212,8 @@ require(['SyntaxParser', 'TemplGenerator', 'text!syntax.html', 'text!edit.html',
             var className = getRuleClass($(this));
             var $current = $(className);
             var newVal = '';
-            //Maybe a subtext generator?
             $current.each(function(){
-                newVal += domParser.parseDefinition($(this), textGenerator);
+                newVal += domParser.parseDefinition($(this), textGenerator) + '\n';
             });
             
             var $currentHead = $current.first();
