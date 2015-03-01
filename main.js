@@ -3,23 +3,36 @@ require(['SyntaxParser', 'TemplGenerator', 'text!syntax.html', 'text!edit.html',
     function parseToken ($token, generator) {
         var text = $token.text().trim();
         if($token.is('.production')){
-            return generator.productionToken(text, text);
+            return generator.productionToken(text);
         }
         if($token.is('.semantic')){
-            return generator.semanticToken(text, text);
+            return generator.semanticToken(text);
         }
         if($token.is('.regex')){
-            return generator.regexToken(text.slice(1, -1), text);
+            return generator.regexToken(text.slice(1, -1));
         }
         if($token.is('.terminal')){
-            return generator.terminalToken(text.toLowerCase(), text);
+            return generator.terminalToken(text.toLowerCase());
         }
     }
+
+    function parseDefinition ($definition, generator) {
+        var tokens = generator.startDefinition();
+        $definition.find('.def-item').each(function(){
+            var token = parseToken($(this), generator);
+            tokens = generator.addToken(tokens, token);
+        });
+        return generator.generateDefinition(tokens);
+    }
+
+
     var domParser = {
         parseToken: parseToken,
+        parseDefinition: parseDefinition,
     };
 
     function TextGenerator (foundTokens) {
+        //Tokens
         this.productionToken = function (token) {
             return token + ' ';
         }
@@ -39,6 +52,18 @@ require(['SyntaxParser', 'TemplGenerator', 'text!syntax.html', 'text!edit.html',
             }
             return token + ' ';
         }
+
+        this.startDefinition = function () {
+            return '';
+        }
+
+        this.addToken = function (tokens, token) {
+            return tokens + token;
+        }
+
+        this.generateDefinition = function (tokens) {
+            return tokens + '\n';
+        }
     }
 
     $(function(){
@@ -55,11 +80,6 @@ require(['SyntaxParser', 'TemplGenerator', 'text!syntax.html', 'text!edit.html',
                 }
                 $extraTokens.append('<span id="rule-'+token+'">'+token+'</span>');
             }
-        }
-
-
-        function disassembleRuleDefinition($item){
-            return domParser.parseToken($item, textGenerator);
         }
 
         $('.jAdd').click(function(){
@@ -97,12 +117,9 @@ require(['SyntaxParser', 'TemplGenerator', 'text!syntax.html', 'text!edit.html',
                     input += ' ';
                 }
                 input += '::= ';
-                $rule.find('.def-item').each(function(){
-                    input += disassembleRuleDefinition($(this));
-                });
-                input += '\n';
-                $('.buttons').hide();
+                input += domParser.parseDefinition($rule, textGenerator);
             });    
+            $('.buttons').hide();
             $('#input').val(input.slice(0, -1));
             $('#output').empty();
             resizeTextArea($('#input'));
@@ -141,17 +158,13 @@ require(['SyntaxParser', 'TemplGenerator', 'text!syntax.html', 'text!edit.html',
             var className = getRuleClass($(this));
             var $current = $(className);
             var newVal = '';
-            var lineCount = 0;
+            //Maybe a subtext generator?
             $current.each(function(){
-                $(this).find('.def-item').each(function(){
-                    newVal += disassembleRuleDefinition($(this));
-                });
-                newVal += '\n';
-                lineCount ++;
+                newVal += domParser.parseDefinition($(this), textGenerator);
             });
             
             var $currentHead = $current.first();
-            $currentHead.find(':not(.name)').remove();
+            $currentHead.children(':not(.name)').remove();
             $currentHead.mustache('templ-edit', {
                 value:newVal.slice(0, -1)
             });
@@ -163,7 +176,7 @@ require(['SyntaxParser', 'TemplGenerator', 'text!syntax.html', 'text!edit.html',
         $('#output').on('click', '.jDelete', function(){
             var $this = $(getRuleClass($(this)));
             $this.find('.def-item').each(function () {
-                disassembleRuleDefinition($(this))
+                domParser.parseToken($(this), textGenerator);
             })
             $this.nextAll().toggleClass('even');
             $this.remove();
