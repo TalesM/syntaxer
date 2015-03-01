@@ -1,5 +1,5 @@
 require(['SyntaxParser', 'TemplGenerator', 'DomParser', 'TextGenerator', 'text!syntax.html', 'text!edit.html', 'text!model.syntax'], 
-function (syntaxParser, TemplGenerator, domParser, TextGenerator, templOutput, templEdit, modelSyntax) {
+function (syntaxParser,   TemplGenerator,   domParser,   TextGenerator,   templOutput,        templEdit,        modelSyntax) {
     'use strict'
     $(function(){
         $.Mustache.add('templ-output', templOutput);
