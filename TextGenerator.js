@@ -47,8 +47,8 @@ define(function () {
 
         //Rules
         var first = false;
-        this.startRule = function (ruleName) {
-            var relSpace = Math.max(0, spaces - ruleName.length)
+        this.startProduction = function (ruleName) {
+            var relSpace = Math.max(0, spaces - ruleName.length);
             for (var i = 0; i < relSpace; i++) {
                 ruleName += ' ';
             };
@@ -63,18 +63,25 @@ define(function () {
             return definitions + freeSpace + '::= '+ definition + '\n';
         }
 
-        this.generateRule = function (definitions) {
+        this.generateProduction = function (definitions) {
             return definitions;
         }
 
         //Syntax
-        this.startSyntax = function() {
+        this.start = function() {
             return '';
         };
-        this.addRule = function (rules, rule) {
+        this.addProduction = function (rules, rule) {
             return rules + rule;
         }
-        this.generateSyntax = function(rules) {
+        this.addTerminal = function(rules, terminalName, terminalRegex) {
+            var relSpace = Math.max(0, spaces - terminalName.length);
+            for (var i = 0; i < relSpace; i++) {
+                terminalName += ' ';
+            };
+            return rules + terminalName.toUpperCase() + '<-- ' + terminalRegex + '\n';
+        };
+        this.generate = function(rules) {
             return rules.slice(0, -1);
         }
 

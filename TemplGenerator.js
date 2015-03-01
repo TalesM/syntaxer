@@ -75,7 +75,6 @@ define(function function_name () {
             return rules.concat(production);
         }
         this.addTerminal = function(rules, terminalName, terminalRegex) {
-            //var ruleName = terminalName.toUpperCase();
             rules.push({
                 ruleName: terminalName.toUpperCase(),
                 even: even,

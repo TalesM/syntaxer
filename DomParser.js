@@ -1,4 +1,5 @@
 define(function () {
+    'use strict'
 	function parseToken ($token, generator) {
         var text = $token.text().trim();
         if($token.is('.production')){
@@ -25,25 +26,33 @@ define(function () {
     }
 
     function parse ($output, generator) {
-        var rules = generator.startSyntax();
+        var rules = generator.start();
         var oldName;
         var definitions;
         $output.children('.rule').each(function(){
             var $rule = $(this);
             var name = $rule.find('.name').text().trim();
             if(name != oldName){
-                if(oldName){
-                    var rule = generator.generateRule(definitions);
-                    rules = generator.addRule(rules, rule);
+                if(oldName && definitions){
+                    var rule = generator.generateProduction(definitions);
+                    rules = generator.addProduction(rules, rule);
                 }
                 oldName = name;
-                definitions = generator.startRule(name);
+                if(name === name.toUpperCase()){
+                    var token = parseToken($rule.find('.regex'), generator);
+                    definitions = undefined;
+                    rules = generator.addTerminal(rules, name.toLowerCase(), token);
+                    return;
+                }
+                definitions = generator.startProduction(name);
             }
             var definition = parseDefinition($rule, generator);
             definitions = generator.addDefinition(definitions, definition);
         });
-        rules = generator.addRule(rules, generator.generateRule(definitions));
-        return generator.generateSyntax(rules);
+        if(definitions){
+            rules = generator.addProduction(rules, generator.generateProduction(definitions));
+        }
+        return generator.generate(rules);
     }
     return {
         parseToken: parseToken,
