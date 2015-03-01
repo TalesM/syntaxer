@@ -56,7 +56,9 @@ define(['module'], function (module) {
             //Would love to dump the ActiveX crap in here. Need IE 6 to die first.
             var xhr, i, progId;
             if (typeof XMLHttpRequest !== "undefined") {
-                return new XMLHttpRequest();
+                var  xhr = new XMLHttpRequest();
+                xhr.overrideMimeType("text/plain; charset=utf-8");
+                return xhr;
             } else if (typeof ActiveXObject !== "undefined") {
                 for (i = 0; i < 3; i += 1) {
                     progId = progIds[i];
