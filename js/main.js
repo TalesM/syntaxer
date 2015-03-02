@@ -7,6 +7,11 @@ requirejs.onError = function (err) {
     // Be sure to rethrow if you don't want to
     // blindly swallow exceptions here!!!
 };
+require.config({
+    paths: {
+        templ: '../templ/'
+    }
+});
 require(['syntaxUi', 'exportUi', 'templates', 'semantics', 'text!templ/model.syntax'], 
 function (syntaxUi,   exportUi,   templates ,  semantics,   modelSyntax) {
     'use strict'
