@@ -1,5 +1,5 @@
-define(['utility', 'text!syntax.html', 'text!edit.html', 'text!Tokenizer.m', 'domReady!'],
-function(utility,   templOutput,        templEdit,        templTokenizer) {
+define(['utility', 'text!templ/syntax.html', 'text!templ/edit.html', 'text!templ/Tokenizer.txt', 'domReady!'],
+function(utility,   templOutput,              templEdit,              templTokenizer,             doc) {
     'use strict'
     $.Mustache.add('templ-output', templOutput);
     $.Mustache.add('templ-edit', templEdit);
