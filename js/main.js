@@ -8,12 +8,16 @@ requirejs.onError = function (err) {
     // blindly swallow exceptions here!!!
 };
 require.config({
+    baseUrl: 'js/ext',
     paths: {
-        templ: '../templ/'
+        templ: '../../templ/',
+        lib: '../lib/',
+        ui: '../ui/',
+        util: '../util/',
     }
 });
-require(['syntaxUi', 'exportUi', 'templates', 'semantics', 'text!templ/model.syntax'], 
-function (syntaxUi,   exportUi,   templates ,  semantics,   modelSyntax) {
+require(['ui/syntax', 'ui/export', 'util/templates', 'ui/semantics', 'text!templ/model.syntax'], 
+function (syntaxUi,    exportUi,    templates ,       semantics,      modelSyntax) {
     'use strict'
     //Dirt trick
     $('#input').val($('#input').val()||modelSyntax);

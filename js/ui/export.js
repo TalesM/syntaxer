@@ -1,5 +1,5 @@
-define(['DomParser', 'JsonGenerator', 'domReady!'], 
-function(domParser,   JsonGenerator ,  doc) {
+define(['lib/DomParser', 'lib/JsonGenerator', 'domReady!'], 
+function(domParser,       JsonGenerator ,      doc) {
 	'use strict'
 	$('.export-json').click(function(event) {
         'use strict'

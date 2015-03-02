@@ -1,5 +1,5 @@
-define(['SyntaxParser', 'DomParser', 'TextGenerator', 'TemplGenerator', 'utility', 'domReady!'], 
-function(syntaxParser,   domParser,   TextGenerator,   TemplGenerator,   utility ,  doc) {
+define(['lib/SyntaxParser', 'lib/DomParser', 'lib/TextGenerator', 'lib/TemplGenerator', 'util/utility', 'domReady!'], 
+function(syntaxParser,       domParser,       TextGenerator,       TemplGenerator,       utility ,       doc) {
 	'use strict'
     var foundTokens = {};
     var templGenerator = new TemplGenerator(foundTokens);

@@ -1,5 +1,5 @@
-define(['utility', 'DomParser', 'JsonGenerator', 'domReady!'],
-function(utility,   domParser,   JsonGenerator,   doc) {
+define(['util/utility', 'lib/DomParser', 'lib/JsonGenerator', 'domReady!'],
+function(utility,        domParser,       JsonGenerator,       doc) {
     $('.generate-semantics').click(function(event) {
         console.log('test');
         // alert('Hello');
