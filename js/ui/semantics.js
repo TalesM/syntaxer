@@ -2,7 +2,7 @@ define(['util/utility', 'lib/DomParser', 'lib/JsonGenerator', 'domReady!'],
 function(utility,        domParser,       JsonGenerator,       doc) {
     'use strict'
     $('.jGenerateTokenizer').click(function(event) {
-        console.log('test');
+        console.log('Generating Tokenizer');
         // alert('Hello');
         var objectNotation = domParser.parse($('#output'), new JsonGenerator());
         var tokens = objectNotation.terminals;
@@ -29,6 +29,20 @@ function(utility,        domParser,       JsonGenerator,       doc) {
     });
 
     $('.jGenerateParser').click(function() {
-        //
+        console.log('Generating Parser');
+        var objectNotation = domParser.parse($('#output'), new JsonGenerator());
+        var productions = objectNotation.productions;
+        var view = {
+            productions: [],
+        };
+        Object.keys(productions).map(function(name) {
+            var definitions = productions[name];
+            view.productions.push({
+                name: name,
+                definitions: definitions,
+            });
+        });
+        var output = Mustache.render($('#jTemplParser').val(), view);
+        utility.resizeTextArea($('#jParserOutput').val(output));
     });
 }); 
