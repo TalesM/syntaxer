@@ -63,6 +63,8 @@ body{font-family: sans-serif;}
     <section class="semantics">
         <h2>Tokenizer</h2>
         <p>Here you define the tokenizer options.</p>
+        <label for="param-whitespace">Whitespace (ignored chars, including comments)</label>
+        <input type="text" id="param-whitespace" value="\s+|#[^\n]*\n'">
         <label for="templ-tokenizer">Template</label>
         <textarea id="templ-tokenizer"></textarea>
         <button class="generate-semantics">Generate</button>

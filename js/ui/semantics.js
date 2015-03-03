@@ -6,7 +6,7 @@ function(utility,        domParser,       JsonGenerator,       doc) {
         var objectNotation = domParser.parse($('#output'), new JsonGenerator());
         var tokens = objectNotation.terminals;
         var view = {
-            ignored: '\\s+|#[^\\n]*\\n',
+            ignored: $('#param-whitespace').val(),
             regexTokens: [],
             extraTokens: [],
         };
