@@ -1,5 +1,6 @@
 define(['util/utility', 'lib/DomParser', 'lib/JsonGenerator', 'domReady!'],
 function(utility,        domParser,       JsonGenerator,       doc) {
+    'use strict'
     $('.jGenerateTokenizer').click(function(event) {
         console.log('test');
         // alert('Hello');
