@@ -144,7 +144,7 @@ function(syntaxParser,       domParser,       TextGenerator,       TemplGenerato
             }).map(function(ruleDef, i){
                 return {
                     ruleName: name,
-                    ruleId: name,
+                    ruleId: name.toLowerCase(),
                     even: $editRule.data('even'),
                     newRule: i==0,
                     ruleDef: syntaxParser.parseDefinition(ruleDef, templGenerator),
