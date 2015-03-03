@@ -3,6 +3,6 @@ function(utility,        templOutput,              templEdit,              templ
     'use strict'
     $.Mustache.add('templ-output', templOutput);
     $.Mustache.add('templ-edit', templEdit);
-    utility.resizeTextArea($('#templ-tokenizer').val(templTokenizer));
+    utility.resizeTextArea($('#jTemplTokenizer').val(templTokenizer));
 
 });

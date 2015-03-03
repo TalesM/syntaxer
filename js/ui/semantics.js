@@ -1,12 +1,12 @@
 define(['util/utility', 'lib/DomParser', 'lib/JsonGenerator', 'domReady!'],
 function(utility,        domParser,       JsonGenerator,       doc) {
-    $('.generate-semantics').click(function(event) {
+    $('.jGenerateTokenizer').click(function(event) {
         console.log('test');
         // alert('Hello');
         var objectNotation = domParser.parse($('#output'), new JsonGenerator());
         var tokens = objectNotation.terminals;
         var view = {
-            ignored: $('#param-whitespace').val(),
+            ignored: $('#jParamWhitespace').val(),
             regexTokens: [],
             extraTokens: [],
         };
@@ -23,8 +23,11 @@ function(utility,        domParser,       JsonGenerator,       doc) {
                 });
             }
         });
-        console.log('test');
-        var output = Mustache.render($('#templ-tokenizer').val(), view);
-        utility.resizeTextArea($('#tokenizer-output').val(output));
+        var output = Mustache.render($('#jTemplTokenizer').val(), view);
+        utility.resizeTextArea($('#jTokenizerOutput').val(output));
+    });
+
+    $('.jGenerateParser').click(function() {
+        //
     });
 }); 

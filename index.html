@@ -66,17 +66,20 @@
     <section class="semantics pure-u-1-3">
         <h2>Tokenizer</h2>
         <p>Here you define the tokenizer options.</p>
-        <label for="param-whitespace">Whitespace (ignored chars, including comments)</label>
-        <input type="text" class="code" id="param-whitespace" value="\s+|#[^\n]*\n'">
-        <label for="templ-tokenizer">Template</label>
-        <textarea id="templ-tokenizer" class="code"></textarea>
-        <button class="generate-semantics pure-button pure-button-primary">Generate</button>
-        <label for="tokenizer-output">Result</label>
-        <textarea id="tokenizer-output" class="code"></textarea>
+        <label for="jParamWhitespace">Whitespace (ignored chars, including comments)</label>
+        <input type="text" class="code" id="jParamWhitespace" value="\s+|#[^\n]*\n'">
+        <label for="jTemplTokenizer">Template</label>
+        <textarea id="jTemplTokenizer" class="code"></textarea>
+        <button class="jGenerateTokenizer pure-button pure-button-primary">Generate</button>
+        <label for="jTokenizerOutput">Tokenizer</label>
+        <textarea id="jTokenizerOutput" class="code"></textarea>
     </section>
     <section class="semantics pure-u-2-3">
         <h2>Parser</h2>
         <p>Here you define the general meaning of the stuff.</p>
+        <button class="jGenerateParser pure-button pure-button-primary">Generate</button>
+        <label for="jParserOutput">Parser</label>
+        <textarea id="jParserOutput" class="code"></textarea>
     </section>
 </section>
 </body>
