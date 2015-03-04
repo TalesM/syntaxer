@@ -90,6 +90,10 @@ define(function function_name () {
             even = !even;
             return rules;
         };
+        this.addWhitespace = function(rules, terminalRegex) {
+            $('#jWhitespace').val(terminalRegex.item);
+            return rules;
+        };
         this.generate = function(rules) {
             return rules;
         }

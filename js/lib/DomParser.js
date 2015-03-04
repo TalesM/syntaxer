@@ -63,6 +63,7 @@ define(function () {
                 rules = generator.addTerminal(rules, token);
             }
         });
+        rules = generator.addWhitespace(rules, generator.regexToken($('#jWhitespace').val())); 
         return generator.generate(rules);
     }
     return {

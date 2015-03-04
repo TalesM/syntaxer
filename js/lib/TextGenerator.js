@@ -84,6 +84,9 @@ define(function () {
             };
             return rules + terminalName.toUpperCase() + '<-- ' + terminalRegex + '\n';
         };
+        this.addWhitespace = function(rules, terminalRegex) {
+            return rules + freeSpace + '<-- ' + terminalRegex + '\n';
+        };
         this.generate = function(rules) {
             return rules.slice(0, -1);
         }

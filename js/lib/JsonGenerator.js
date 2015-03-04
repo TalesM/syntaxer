@@ -104,6 +104,10 @@ define(function () {
             rules.terminals[terminalName] = terminalRegex;
             return rules;
         };
+        this.addWhitespace = function(rules, terminalRegex) {
+            rules.whitespace = terminalRegex;
+            return rules;
+        };
         this.generate = function(rules) {
             return rules;
         }

@@ -82,7 +82,11 @@
         <textarea id="input" class="code" placeholder="New Rules Here"></textarea><br/>
         <button class="jAdd pure-button pure-button-primary">Add</button>
     </section>
-    <section class="pure-u-1">
+    <section class="pure-u-1-2 pure-u-sm-1-4">
+        <h2>Whitespace</h2>
+        <input type="text" class="code" id="jWhitespace" value="">
+    </section>
+    <section class="pure-u-1-2 pure-u-sm-3-4">
         <h2>Extra Tokens</h2>
         <div class="extra-tokens">
         </div>
@@ -147,7 +151,7 @@
     </section>
     <section class="form pure-u-1 pure-u-sm-1-2">
         <h2>Logs</h2>
-        <select multiple="" class="code"></select>
+        <textarea id="jLogs" class="code"></textarea>
     </section>
 </section>
 <section id="export" class="pure-g domManipulator">
@@ -160,8 +164,6 @@
     <section class="form pure-u-1 pure-u-sm-2-3 pure-u-lg-1-3">
         <h2>Tokenizer</h2>
         <p>Here you define the tokenizer options.</p>
-        <label for="jParamWhitespace">Whitespace (ignored chars, including comments)</label>
-        <input type="text" class="code" id="jParamWhitespace" value="\s+|#[^\n]*\n'">
         <label for="jTemplTokenizer">Template</label>
         <textarea id="jTemplTokenizer" class="code"></textarea>
         <a class="jGenerateTokenizer pure-button pure-button-primary" download="Tokenizer.js" href>Export</a>

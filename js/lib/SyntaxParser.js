@@ -55,7 +55,7 @@ define(function() {
                     rules = generator.addProduction(rules, rule);
                 }
                 oldRuleName = ruleName;
-                if(ruleName === ruleName.toUpperCase()){
+                if(ruleName === ruleName.toUpperCase() ){
                     if(separator !== '<--'){
                         console.log('Expected "<--"" instead of "'+separator+'at: '+rule);
                     }
@@ -64,8 +64,12 @@ define(function() {
                     return generator.addTerminal(rules, ruleName.toLowerCase(), token);
                 }else{
                     definitions = generator.startProduction(ruleName);
-                }   
-            } 
+                }
+            } else if(ruleName === '' && separator === '<--'){
+                definitions = undefined;
+                var token = parseToken(ruleDef, generator);
+                return generator.addWhitespace(rules, token);
+            }
             if(separator !== '::='){
                 console.log('Expected "::="" instead of "'+separator+'" at: '+rule);
             }

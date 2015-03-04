@@ -32,3 +32,4 @@ aparams     ::= type {signature-add[type]} {end-type} , aparams
 INT         <-- /int\b/
 NAME        <-- /([A-Za-z_][\w_\d]*)/
 NUMBER      <-- /([\d][_\d]*)/
+            <-- /\s+|#[^\n]*\n/
