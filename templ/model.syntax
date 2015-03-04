@@ -1,12 +1,12 @@
 pgm         ::= {begin-stack} {begin-symboltbl} stms {end-symboltbl} {stack-result} {end-stack} 
-stms        ::= stm ; stms
+stms        ::= stm ; stms 
             ::= stm ; {stack-pop} 
 stm         ::= expr 
 expr        ::= NUMBER {stack-pushnumber[$]} 
             ::= funcall 
             ::= varuse 
             ::= lambda 
-funcall     ::= NAME {symboltbl-check[$]} {begin-call} argList {call-named[$]} {end-call} 
+funcall     ::= NAME {symboltbl-check[$]} {begin-call} argList {call-named} {end-call} 
             ::= ( expr ) {begin-call} argList {call-stack} {end-call} 
 argList     ::= ( ) 
             ::= ( args ) 
