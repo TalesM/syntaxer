@@ -16,8 +16,8 @@ require.config({
         util: '../util/',
     }
 });
-require(['ui/syntax', 'ui/export', 'util/templates', 'ui/semantics', 'text!templ/model.syntax'], 
-function (syntaxUi,    exportUi,    templates ,       semantics,      modelSyntax) {
+require(['ui/syntax', 'ui/export', 'util/templates', 'ui/semantics', 'ui/tests', 'text!templ/model.syntax'], 
+function (syntaxUi,    exportUi,    templates ,       semantics,      tests,      modelSyntax) {
     'use strict'
     //Dirt trick
     $('#input').val($('#input').val()||modelSyntax);
