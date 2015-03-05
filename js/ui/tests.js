@@ -18,14 +18,14 @@ function(domParser,       JsonGenerator,      utility,  doc) {
 	 * @throws {Error} If it can't analyse.
 	 */
 	function analyzeTokens(str, analyzer) {
-		var whitespace = new RegExp(analyzer.whitespace);
+		var whitespace = new RegExp('^'+analyzer.whitespace);
 		var regexes = [], strings = [];
 		var terminals = analyzer.terminals;
 		for(var tokenName in terminals){
 			if(terminals[tokenName] === true){
 				strings.push(tokenName);
 			} else {
-				regexes.push([tokenName, new RegExp(terminals[tokenName])]);
+				regexes.push([tokenName, new RegExp('^'+terminals[tokenName])]);
 			}
 		}
 		var tokens = [];
@@ -53,6 +53,7 @@ function(domParser,       JsonGenerator,      utility,  doc) {
 			if(strings.some(function(token) {
 				if(str.indexOf(token)===0){
 					str = str.slice(token.length);
+					tokens.push([token]);
 					return true;
 				}
 				return false;
@@ -66,14 +67,28 @@ function(domParser,       JsonGenerator,      utility,  doc) {
 
 	$('#jVerifyTokens').click(function() {
 		log('Verifying Tokens...');
-		var tokens = $('#jInputTokens').val();
+		var tokens = $('#jTestText').val();
 		var analyzer = domParser.parse($('#output'), new JsonGenerator());
 		try {
-			analyzeTokens(tokens, analyzer);
+			var toks = analyzeTokens(tokens, analyzer);
 			log('Passed');
+			console.info(toks);
 		} catch(error){
 			log('Invalid');
 			console.error(error);
+		}
+	});
+	$('#jGenerateTokens').click(function() {
+		log('Compiling Tokens...');
+		var tokens = $('#jTestText').val();
+		var analyzer = domParser.parse($('#output'), new JsonGenerator());
+		try {
+			var toks = analyzeTokens(tokens, analyzer);
+			log('Passed');
+			utility.resizeTextArea($('#jTestTokens').val( JSON.stringify(toks) ));
+		} catch(error){
+			log('Invalid');
+			utility.resizeTextArea($('#jTestTokens').val('Error: '+error.toString()));
 		}
 	});
 });
