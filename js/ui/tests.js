@@ -65,6 +65,19 @@ function(domParser,       JsonGenerator,      utility,  doc) {
 		return tokens;
 	}
 
+	function verifySyntax (tokens, analyzer) {
+		var state = analyzer.start;
+		var productions = analyzer.productions;
+		return (function doAnalysis (tokens, productions, state) {
+			return productions[state].some(function(definition) {
+				return definition.every(function(item, pos) {
+					return tokens.length > pos 
+						&& ((item.terminal)?(item.item===tokens[pos][0]):(doAnalysis(tokens.slice(pos), productions, item.item)));
+				});
+			});
+		})(tokens, productions, state);
+	}
+
 	$('#jVerifyTokens').click(function() {
 		log('Verifying Tokens...');
 		var tokens = $('#jTestText').val();
@@ -89,6 +102,22 @@ function(domParser,       JsonGenerator,      utility,  doc) {
 		} catch(error){
 			log('Invalid');
 			utility.resizeTextArea($('#jTestTokens').val('Error: '+error.toString()));
+		}
+	});
+
+	$('#jVerifySyntax').click(function() {
+		log('Verifying Syntax-only...');
+		var tokens = JSON.parse($('#jTestTokens').val());
+		var analyzer = domParser.parse($('#output'), new JsonGenerator());
+		try {
+			if(verifySyntax(tokens, analyzer)){
+				log('Passed');
+			} else {
+				log('Rejected');
+			}
+		} catch(error){
+			log('Error');
+			console.error(error);
 		}
 	});
 });
