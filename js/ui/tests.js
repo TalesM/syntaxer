@@ -68,14 +68,40 @@ function(domParser,       JsonGenerator,      utility,  doc) {
 	function verifySyntax (tokens, analyzer) {
 		var state = analyzer.start;
 		var productions = analyzer.productions;
-		return (function doAnalysis (tokens, productions, state) {
-			return productions[state].some(function(definition) {
-				return definition.every(function(item, pos) {
-					return tokens.length > pos 
-						&& ((item.terminal)?(item.item===tokens[pos][0]):(doAnalysis(tokens.slice(pos), productions, item.item)));
-				});
-			});
-		})(tokens, productions, state);
+		function doAnalysis (tokens, state) {
+			var production = productions[state];
+			if(!production){
+				console.log(state);
+				throw new Error('production named "'+state+'" not found');
+			}
+			PRODLOOP:
+			for (var i = 0; i < production.length; i++) {
+				var definition = production[i];
+				var localTokens = tokens;
+				for (var j = 0; j < definition.length; j++) {
+					var item = definition[j];
+					var token = localTokens[0];
+					if(!token){
+						continue PRODLOOP;
+					}
+					if(item.terminal){
+						if(item.item !== token[0]){
+							continue PRODLOOP;
+						}
+						localTokens = localTokens.slice(1);
+					}else {
+						var choosen = doAnalysis(localTokens, item.item);
+						if(!choosen){
+							continue PRODLOOP;
+						}
+						localTokens = localTokens.slice(choosen);
+					}
+				}
+				return tokens.length - localTokens.length;
+			}
+			return null;
+		};
+		return doAnalysis(tokens, state) === tokens.length;
 	}
 
 	$('#jVerifyTokens').click(function() {
