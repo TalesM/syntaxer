@@ -18,7 +18,7 @@ captureList ::= [ {begin-lambda} ]
             ::= [ {begin-lambda} captures ] 
 captures    ::= NAME {lambda-add-capture[$]} , captures 
             ::= NAME {lambda-add-capture[$]} 
-paramlist   ::= ( ) 
+paramList   ::= ( ) 
             ::= ( params ) 
 params      ::= param , params 
             ::= param 
@@ -29,7 +29,7 @@ aparamList  ::= ( {begin-signature} )
             ::= ( {begin-signature} aparamList ) 
 aparams     ::= type {signature-add[type]} {end-type} , aparams 
             ::= type {signature-add[type]} {end-type} 
-INT         <-- /int\b/
+INT         <-- /(int)\b/
 NAME        <-- /([A-Za-z_][\w_\d]*)/
 NUMBER      <-- /([\d][_\d]*)/
             <-- /\s+|#[^\n]*\n/

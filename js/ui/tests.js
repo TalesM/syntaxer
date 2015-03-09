@@ -68,6 +68,7 @@ function(domParser,       JsonGenerator,      utility,  doc) {
 	function verifySyntax (tokens, analyzer) {
 		var state = analyzer.start;
 		var productions = analyzer.productions;
+		var ast;
 		function doAnalysis (tokens, state) {
 			var production = productions[state];
 			if(!production){
@@ -78,6 +79,7 @@ function(domParser,       JsonGenerator,      utility,  doc) {
 			for (var i = 0; i < production.length; i++) {
 				var definition = production[i];
 				var localTokens = tokens;
+				var localAst = {};
 				for (var j = 0; j < definition.length; j++) {
 					var item = definition[j];
 					var token = localTokens[0];
@@ -88,20 +90,25 @@ function(domParser,       JsonGenerator,      utility,  doc) {
 						if(item.item !== token[0]){
 							continue PRODLOOP;
 						}
+						if(token.length > 1){
+							localAst[item.item] = token[1];
+						}
 						localTokens = localTokens.slice(1);
 					}else {
 						var choosen = doAnalysis(localTokens, item.item);
 						if(!choosen){
 							continue PRODLOOP;
 						}
+						localAst[item.item] = ast;
 						localTokens = localTokens.slice(choosen);
 					}
 				}
+				ast = localAst;
 				return tokens.length - localTokens.length;
 			}
 			return null;
 		};
-		return doAnalysis(tokens, state) === tokens.length;
+		return doAnalysis(tokens, state) === tokens.length?ast:null;
 	}
 
 	$('#jVerifyTokens').click(function() {
@@ -138,6 +145,25 @@ function(domParser,       JsonGenerator,      utility,  doc) {
 		try {
 			if(verifySyntax(tokens, analyzer)){
 				log('Passed');
+			} else {
+				log('Rejected');
+			}
+		} catch(error){
+			log('Error');
+			console.error(error);
+		}
+	});
+
+	$('#jGenerateAST').click(function() {
+		log('Generating AST...');
+		var tokens = JSON.parse($('#jTestTokens').val());
+		var analyzer = domParser.parse($('#output'), new JsonGenerator());
+		try {
+			var ast = verifySyntax(tokens, analyzer);
+			if(ast){
+				log('Passed');
+				console.log(ast);
+				$('#jTestAST').val(JSON.stringify(ast));
 			} else {
 				log('Rejected');
 			}
