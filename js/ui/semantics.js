@@ -1,9 +1,9 @@
-define(['domReady!', 'text!templ/semantic.html'],
-function(dom,         templSemantic            ) {
+define(['domReady!', 'text!templ/semantics.html'],
+function(dom,         templSemantics            ) { 
 	'use strict';
-    $.Mustache.add('templ-semantic', templSemantic);
+    $.Mustache.add('templ-semantics', templSemantics);
     var $semanticsContainer = $('.semantics-cointainer');
-	$semanticsContainer.empty().mustache('templ-semantic', [
+	$semanticsContainer.empty().mustache('templ-semantics', [
 		{
 			name: 'Stack1',
 			fields: [],
