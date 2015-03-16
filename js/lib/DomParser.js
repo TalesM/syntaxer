@@ -42,6 +42,14 @@ define(function () {
                     rules = generator.addProduction(rules, rule);
                 }
                 oldName = name;
+                if(name === '<whitespace>'){
+                    var token = parseToken($rule.find('.regex'), generator);
+                    definitions = undefined;
+                    var ruleName = name.toLowerCase();
+                    tokens[ruleName] = true;
+                    rules = generator.addWhitespace(rules, token);
+                    return;
+                }
                 if(name === name.toUpperCase()){
                     var token = parseToken($rule.find('.regex'), generator);
                     definitions = undefined;
@@ -63,7 +71,6 @@ define(function () {
                 rules = generator.addTerminal(rules, token);
             }
         });
-        rules = generator.addWhitespace(rules, generator.regexToken($definition.find('#jWhitespace').val())); 
         return generator.generate(rules);
     }
     return {

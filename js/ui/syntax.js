@@ -166,9 +166,7 @@ function(syntaxParser,       domParser,       TextGenerator,       TemplGenerato
         }
         
         if(rules.length){
-            $editRule.before($.Mustache.render('templ-output', {
-                rules: rules
-            }));
+            $editRule.mustache('syntax', rules, { method: 'before' });
         } else {
             $editRule.nextAll().toggleClass('even');
         }

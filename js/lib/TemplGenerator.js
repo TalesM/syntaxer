@@ -91,7 +91,15 @@ define(function function_name () {
             return rules;
         };
         this.addWhitespace = function(rules, terminalRegex) {
-            rules.whitespace = terminalRegex.item;
+            rules.push({
+                ruleName: '<whitespace>',
+                ruleId: '_whitespace_',
+                even: even,
+                newRule: true,
+                ruleDef: [terminalRegex],
+                classes: 'terminal',
+            });
+            even = !even;
             return rules;
         };
         this.generate = function(rules) {
