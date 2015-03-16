@@ -1,31 +1,29 @@
-{{#rules}}
-    <div class="rule rule-{{ruleId}} {{#even}}even{{/even}} 
+<div class="rule rule-{{ruleId}} {{#even}}even{{/even}} 
 {{#newRule}}head{{/newRule}} {{classes}}" 
 {{#newRule}}id="rule-{{ruleId}}"{{/newRule}}>
-        <span class="name item {{^newRule}}repetition{{/newRule}}">
-            {{ruleName}}
-        </span>
-        <span class="definition item">
-            {{#ruleDef}}
-                {{#link}}
-                    <a href="{{link}}" class="def-item {{classes}}">
-                        {{item}}
-                    </a>
-                {{/link}}
-                {{^link}}
-                    <span class="def-item {{classes}}">
-                        {{item}}
-                    </span>
-                {{/link}}
-            {{/ruleDef}}
-        </span>
-        {{#newRule}}
-        <span class="buttons item">{{!
-            }}<span class="button jEdit">E</span>{{!
-            }}<span class="button jUp">&uparrow;</span>{{!
-            }}<span class="button jDown">&downarrow;</span>{{!
-            }}<span class="button jDelete">&times;</span>{{!
-        }}</span>
-        {{/newRule}}
-    </div>
-{{/rules}}
+    <span class="name item {{^newRule}}repetition{{/newRule}}">
+        {{ruleName}}
+    </span>
+    <span class="definition item">
+        {{#ruleDef}}
+            {{#link}}
+                <a href="{{link}}" class="def-item {{classes}}">
+                    {{item}}
+                </a>
+            {{/link}}
+            {{^link}}
+                <span class="def-item {{classes}}">
+                    {{item}}
+                </span>
+            {{/link}}
+        {{/ruleDef}}
+    </span>
+    {{#newRule}}
+    <span class="buttons item">{{!
+        }}<span class="button jEdit">E</span>{{!
+        }}<span class="button jUp">&uparrow;</span>{{!
+        }}<span class="button jDown">&downarrow;</span>{{!
+        }}<span class="button jDelete">&times;</span>{{!
+    }}</span>
+    {{/newRule}}
+</div>

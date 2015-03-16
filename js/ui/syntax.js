@@ -28,20 +28,20 @@ function(syntaxParser,       domParser,       TextGenerator,       TemplGenerato
         return '.' + $button.closest('.rule').attr('id');
     }
 
-    $('.jAdd').click(function(){
+    $('#definition').on('click', '.jAdd', function(){
         var even = true;
         var bruteText = $('#input').val().trim();
         if(!bruteText)
             return;
         var rules = syntaxParser.parse(bruteText, templGenerator);
         $('.buttons').show();
-        $('#output').mustache('templ-output', {rules:rules});
+        $('#definition').mustache('definition', {rules:rules}, { method: 'html' }); //WRITE templ dfinition
         utility.resizeTextArea($('#input').val(''));
         refreshExtraTokens();
     });
-    $('.jEditAll').click(function(){
+    $('#definition').on('click', '.jEditAll', function(){
         var spaces = 0;
-        $('#output .rule .name').each(function(){
+        $('#definition .rule .name').each(function(){
             var length =$(this).text().trim().length;
             if(length >= spaces){
                 spaces = length + 1;
@@ -49,16 +49,14 @@ function(syntaxParser,       domParser,       TextGenerator,       TemplGenerato
         });
 
         textGenerator.spaces(spaces);
-        var input = domParser.parse($('#output'), textGenerator);
-        $('.buttons').hide();
-        $('#input').val(input);
-        $('#output').empty();
+        var input = domParser.parse($('#definition'), textGenerator);
+        $('#definition').mustache('definition', {text:input}, { method: 'html' });
         utility.resizeTextArea($('#input'));
     });
     $('.jToogle').click(function(){
         $('.semantic').toggle();
     });
-    $('#output').on('click', '.jUp', function(){
+    $('#definition').on('click', '.jUp', function(){
         var $currentHead = $(this).closest('.rule');
         var $current = $(getRuleClass($currentHead));
         var $prevHead = $currentHead.prevAll('.head').first();
@@ -70,7 +68,7 @@ function(syntaxParser,       domParser,       TextGenerator,       TemplGenerato
         });
     });
 
-    $('#output').on('click', '.jDown', function(){
+    $('#definition').on('click', '.jDown', function(){
         var $currentHead = $(this).closest('.rule');
         var $current = $(getRuleClass($currentHead));
         var $nextHead = $currentHead.nextAll('.head').first();
@@ -82,7 +80,7 @@ function(syntaxParser,       domParser,       TextGenerator,       TemplGenerato
         });
     });
 
-    $('#output').on('click', '.jEdit', function(){
+    $('#definition').on('click', '.jEdit', function(){
         var className = getRuleClass($(this));
         var $current = $(className);
         var newVal;
@@ -113,7 +111,7 @@ function(syntaxParser,       domParser,       TextGenerator,       TemplGenerato
 
         utility.resizeTextArea($currentHead.find('textarea'));
     });
-    $('#output').on('click', '.jDelete', function(){
+    $('#definition').on('click', '.jDelete', function(){
         var $this = $(getRuleClass($(this)));
         $this.find('.def-item').each(function () {
             domParser.parseToken($(this), textGenerator);
@@ -123,11 +121,11 @@ function(syntaxParser,       domParser,       TextGenerator,       TemplGenerato
         refreshExtraTokens();
     });
 
-    $('#output').on('click', '.jResetEdit', function(){
+    $('#definition').on('click', '.jResetEdit', function(){
         var $value = $(this).closest('.rule').find('.value');
         $value.val($value.text());
     });
-    $('#output').on('click', '.jOkEdit', function(){
+    $('#definition').on('click', '.jOkEdit', function(){
         var $editRule = $(this).closest('.rule');
         var $value = $editRule.find('.value');
         var newVal = $value.val().trim();
@@ -177,4 +175,7 @@ function(syntaxParser,       domParser,       TextGenerator,       TemplGenerato
         var $this = $(this);
         utility.resizeTextArea($this);
     });
+    //Dirt trick
+    $('#input').val($('#input').val()||modelSyntax);
+    $('.jAdd').click();
 })

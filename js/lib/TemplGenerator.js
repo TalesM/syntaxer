@@ -91,7 +91,7 @@ define(function function_name () {
             return rules;
         };
         this.addWhitespace = function(rules, terminalRegex) {
-            $('#jWhitespace').val(terminalRegex.item);
+            rules.whitespace = terminalRegex.item;
             return rules;
         };
         this.generate = function(rules) {

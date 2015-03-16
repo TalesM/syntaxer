@@ -2,13 +2,13 @@ define(['util/utility', 'lib/DomParser', 'lib/JsonGenerator', 'domReady!'],
 function(utility,        domParser,       JsonGenerator ,      doc) {
 	'use strict'
 	$('.jGenerateJson').click(function(event) {
-        var result = domParser.parse($(output), new JsonGenerator());
+        var result = domParser.parse($('#definition'), new JsonGenerator());
         this.href = 'data:,'+encodeURIComponent(JSON.stringify(result));
     });
     $('.jGenerateTokenizer').click(function(event) {
         console.log('Generating Tokenizer');
         // alert('Hello');
-        var objectNotation = domParser.parse($('#output'), new JsonGenerator());
+        var objectNotation = domParser.parse($('#definition'), new JsonGenerator());
         var tokens = objectNotation.terminals;
         var view = {
             ignored: $('#jWhitespace').val(),
@@ -34,7 +34,7 @@ function(utility,        domParser,       JsonGenerator ,      doc) {
 
     $('.jGenerateParser').click(function() {
         console.log('Generating Parser');
-        var objectNotation = domParser.parse($('#output'), new JsonGenerator());
+        var objectNotation = domParser.parse($('#definition'), new JsonGenerator());
         var productions = objectNotation.productions;
         var view = {
             productions: [],

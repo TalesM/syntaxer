@@ -28,12 +28,12 @@ define(function () {
         return generator.generateDefinition(tokens);
     }
 
-    function parse ($output, generator) {
+    function parse ($definition, generator) {
         tokens = {};
         var rules = generator.start();
         var oldName;
         var definitions;
-        $output.children('.rule').each(function(){
+        $definition.children('.rule').each(function(){
             var $rule = $(this);
             var name = $rule.find('.name').text().trim();
             if(name != oldName){
@@ -63,7 +63,7 @@ define(function () {
                 rules = generator.addTerminal(rules, token);
             }
         });
-        rules = generator.addWhitespace(rules, generator.regexToken($('#jWhitespace').val())); 
+        rules = generator.addWhitespace(rules, generator.regexToken($definition.find('#jWhitespace').val())); 
         return generator.generate(rules);
     }
     return {
