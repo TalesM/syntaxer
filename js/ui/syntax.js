@@ -1,5 +1,5 @@
-define(['lib/SyntaxParser', 'lib/DomParser', 'lib/TextGenerator', 'lib/TemplGenerator', 'util/utility', 'domReady!'], 
-function(syntaxParser,       domParser,       TextGenerator,       TemplGenerator,       utility ,       doc) {
+define(['lib/SyntaxParser', 'lib/DomParser', 'lib/TextGenerator', 'lib/TemplGenerator', 'util/utility', 'text!templ/model.syntax', 'domReady!'], 
+function(syntaxParser,       domParser,       TextGenerator,       TemplGenerator,       utility ,       modelSyntax ,                    doc) {
 	'use strict'
     var foundTokens = {};
     var templGenerator = new TemplGenerator(foundTokens);
@@ -35,7 +35,11 @@ function(syntaxParser,       domParser,       TextGenerator,       TemplGenerato
             return;
         var rules = syntaxParser.parse(bruteText, templGenerator);
         $('.buttons').show();
-        $('#definition').mustache('definition', {rules:rules}, { method: 'html' }); //WRITE templ dfinition
+        if($(this).is('.jAll')){
+            $('#definition').mustache('definition', {rules:rules}, { method: 'html' });
+        }else {
+            $('.output').mustache('syntax', rules);
+        }
         utility.resizeTextArea($('#input').val(''));
         refreshExtraTokens();
     });
@@ -175,7 +179,11 @@ function(syntaxParser,       domParser,       TextGenerator,       TemplGenerato
         var $this = $(this);
         utility.resizeTextArea($this);
     });
-    //Dirt trick
-    $('#input').val($('#input').val()||modelSyntax);
-    $('.jAdd').click();
+
+
+    ////////////
+    //Loading //
+    ////////////
+    $('#definition').mustache('definition', {text: $('#input').val()||modelSyntax}, { method: 'html' });
+    utility.resizeTextArea($('#input'));
 })
