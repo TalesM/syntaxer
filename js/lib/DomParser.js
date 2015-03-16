@@ -33,7 +33,7 @@ define(function () {
         var rules = generator.start();
         var oldName;
         var definitions;
-        $definition.children('.rule').each(function(){
+        $definition.find('.rule').each(function(){
             var $rule = $(this);
             var name = $rule.find('.name').text().trim();
             if(name != oldName){
