@@ -153,11 +153,20 @@ function(syntaxParser,       domParser,       TextGenerator,       TemplGenerato
                     classes: 'production'
                 };
             });
+        } else if(name === '<whitespace>') {
+            rules = [{
+                ruleName: '<whitespace>',
+                ruleId: '_whitespace_',
+                even: $editRule.data('even'),
+                newRule: true,
+                ruleDef: [syntaxParser.parseToken(newVal, templGenerator)],
+                classes: 'terminal'
+            }];
         } else {
 
             rules = [{
                 ruleName: name,
-                ruleId: name,
+                ruleId: name.toLowerCase(),
                 even: $editRule.data('even'),
                 newRule: true,
                 ruleDef: [syntaxParser.parseToken(newVal, templGenerator)],
