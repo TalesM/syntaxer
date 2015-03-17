@@ -11,7 +11,7 @@ function(utility,        domParser,       JsonGenerator ,      doc) {
         var objectNotation = domParser.parse($('#definition'), new JsonGenerator());
         var tokens = objectNotation.terminals;
         var view = {
-            ignored: $('#jWhitespace').val(),
+            ignored: objectNotation.whitespace,
             regexTokens: [],
             extraTokens: [],
         };
