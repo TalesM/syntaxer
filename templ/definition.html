@@ -12,9 +12,17 @@
             <button class="jEditAll pure-button">Edit All</button>
         </div>
         <div id="output" class="pure-u-1">
-            {{# rules }} 
+            {{# rules.productions }} 
+                {{# definitions }} 
+                    {{> syntax }}
+                {{/ definitions }} 
+            {{/ rules.productions }} 
+            {{# rules.terminals }} 
                 {{> syntax }}
-            {{/ rules }} 
+            {{/ rules.terminals }} 
+            {{# rules.whitespace }}
+                {{> syntax }}
+            {{/ rules.whitespace }}
         </div>
         <section class="pure-u-1">
             <textarea id="input" class="code" placeholder="New Rules Here"></textarea><br/>

@@ -46,20 +46,18 @@ define(function function_name () {
             return tokens;
         };
 
-        var even = true;
-        var ruleName;
         this.startProduction = function(name) {
-            ruleName = name;
-            return [];
+            return {
+                ruleName: name,
+                ruleId: name,
+                classes: 'production',
+                definitions: [],
+            };
         };
         this.addDefinition = function(definitions, definition) {
-            definitions.push({
-                ruleName: ruleName,
-                ruleId: ruleName,
-                even: even,
-                newRule: !definitions.length,
+            definitions.definitions.push({
+                newRule: !definitions.definitions.length,
                 ruleDef: definition,
-                classes: 'production',
             });
             return definitions;
         };
@@ -69,40 +67,48 @@ define(function function_name () {
 
         //Syntax
         this.start = function() {
-            return [];
+            return {
+                productions: [],
+                terminals: [],
+                whitespace: null,
+            };
         };
         this.addProduction = function (rules, production) {
-            even = !even;
-            return rules.concat(production);
+            rules.productions.push(production);
+            return rules;
         }
         this.addTerminal = function(rules, terminalName, terminalRegex) {
             if(!terminalRegex){
                 return rules;
             }
-            rules.push({
+            rules.terminals.push({
                 ruleName: terminalName.toUpperCase(),
                 ruleId: terminalName,
-                even: even,
                 newRule: true,
                 ruleDef: [terminalRegex],
                 classes: 'terminal',
             });
-            even = !even;
             return rules;
         };
         this.addWhitespace = function(rules, terminalRegex) {
-            rules.push({
+            rules.whitespace = {
                 ruleName: '<whitespace>',
                 ruleId: '_whitespace_',
-                even: even,
                 newRule: true,
                 ruleDef: [terminalRegex],
                 classes: 'terminal',
-            });
-            even = !even;
+            };
             return rules;
         };
         this.generate = function(rules) {
+            var even = true;
+            function evenizator (val) {
+                val.even = even;
+                even = !even;
+            }
+            rules.productions.forEach(evenizator);
+            rules.terminals.forEach(evenizator);
+            evenizator(rules.whitespace);
             return rules;
         }
     };
