@@ -57,7 +57,7 @@ function(syntaxParser,       domParser,       TextGenerator,       TemplGenerato
         $('#definition').mustache('definition', {text:input}, { method: 'html' });
         utility.resizeTextArea($('#input'));
     });
-    $('.jToogle').click(function(){
+    $('#definition').on('click', '.jToogle', function(){
         $('.semantic').toggle();
     });
     $('#definition').on('click', '.jUp', function(){
