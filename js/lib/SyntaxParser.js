@@ -5,9 +5,15 @@ define(function() {
         if(token[0] !== token[0].toUpperCase()){
             return generator.productionToken(token)
         } 
-        if(token[0]=== '{' 
-           && token[token.length-1]==='}'){
-            return generator.semanticToken(token.slice(1, -1));
+        var m = token.match(/^\{(\+\+|\-\-)?(\w+)(?:\.(\w+))?(?:\(($|\w*)\))?\}$/) ;
+        if(m){
+            if(m[1]=== '++'){
+                return generator.semanticToken('push', m[2], undefined, m[4]||false);
+            } 
+            if(m[1]=== '--'){
+                return generator.semanticToken('pop', m[2]);
+            }
+            return generator.semanticToken('call', m[2], m[3], m[4]||false);
         }
         if(token[0]=== '/' && token[token.length-1]==='/'){
             return generator.regexToken(token.slice(1, -1));

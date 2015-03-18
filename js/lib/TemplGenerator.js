@@ -7,29 +7,29 @@ define(function function_name () {
         //token
         this.productionToken = function (token) {
             return {
-                link: '#rule-'+token,
-                classes: 'production',
+                production: true,
                 item: token,
             };
         };
-        this.semanticToken = function (token) {
+        this.semanticToken = function (type, obj, action, parameter) {
             return {
-                link: '#func-'+token,
-                classes: 'semantic',
-                item: token,
+                semantic: true,
+                type: type,
+                obj: obj,
+                action: action,
+                parameter: parameter,
             };
         };
         this.regexToken = function(token) {
             return {
-                classes: 'regex',
+                regex: true,
                 item: token,
             };
         };
         this.terminalToken = function(token) {
             foundTokens[token] = (foundTokens[token]||0)+1;
             return {
-                link: '#rule-'+token,
-                classes: 'terminal',
+                terminal: true,
                 item: token.toUpperCase(),
             };
         };

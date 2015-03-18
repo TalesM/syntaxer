@@ -15,12 +15,14 @@
     .rule .item{display: table-cell}
     .rule.edit{background: #ddd;}
     .rule .value{width: calc(100% - 4em)}
-    .production > .definition::before{content: '::= '; vertical-align: top; color: black;}
+    .production > .definition::before{content: '::= '; vertical-align: top; color: black}
     .terminal > .definition::before{content: '<-- '; vertical-align: top; color: black;}
     .name{padding-right: 0.25em; vertical-align: top;}
     .name.repetition{color:#aaa}
     .def-item{padding-left: 0.25em; text-decoration: none}
     .semantic + .semantic {color: brown;}
+    .semantic.push::before {content: '+'; border: 1px solid green; border-radius: 1em}
+    .semantic.pop::before {content: '-'; border: 1px solid orange; border-radius: 1em}
     .even{background: #eee}
     .terminal{color:green}
     .production{color:blue}

@@ -1,11 +1,8 @@
 requirejs.onError = function (err) {
-    /* 
-        err has the same info as the errback callback:
-        err.requireType & err.requireModules
-    */
     console.error(err);
-    // Be sure to rethrow if you don't want to
-    // blindly swallow exceptions here!!!
+};
+window.onerror = function (err) {
+    console.error(err);
 };
 require.config({
     baseUrl: 'js/ext',

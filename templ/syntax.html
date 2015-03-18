@@ -1,21 +1,31 @@
-<div class="rule rule-{{ruleId}} {{#even}}even{{/even}} 
+<div class="rule rule-{{ruleName}} {{#even}}even{{/even}} 
 {{#newRule}}head{{/newRule}} {{classes}}" 
-{{#newRule}}id="rule-{{ruleId}}"{{/newRule}}>
+{{#newRule}}id="rule-{{ruleName}}"{{/newRule}}>
     <span class="name item {{^newRule}}repetition{{/newRule}}">
         {{ruleName}}
     </span>
     <span class="definition item">
         {{#ruleDef}}
-            {{#link}}
-                <a href="{{link}}" class="def-item {{classes}}">
+            {{#production}}
+                <a href="#rule-{{item}}" class="def-item production">
                     {{item}}
                 </a>
-            {{/link}}
-            {{^link}}
-                <span class="def-item {{classes}}">
+            {{/production}}
+            {{#semantic}}
+                <span class="def-item semantic {{type}}">{{!
+                    }}{{obj}}{{#action}}.{{action}}{{/action}}{{#parameter}}({{parameter}}){{/parameter}}
+                </span>
+            {{/semantic}}
+            {{#regex}}
+                <span class="def-item regex">
                     {{item}}
                 </span>
-            {{/link}}
+            {{/regex}}
+            {{#terminal}}
+                <a href="#rule-{{item}}" class="def-item terminal">
+                    {{item}}
+                </a>
+            {{/terminal}}
         {{/ruleDef}}
     </span>
     {{#newRule}}
