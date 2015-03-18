@@ -7,7 +7,11 @@ define(function () {
             return generator.productionToken(text);
         }
         if($token.is('.semantic')){
-            return generator.semanticToken(text);
+            var type = ($token.is('.push'))?('push'):(($token.is('.pop'))?'pop':'call');
+            var obj = $token.find('.obj').text();
+            var action = $token.find('.action').text();
+            var parameter = $token.find('.parameter').text();
+            return generator.semanticToken(type, obj, action, parameter);
         }
         if($token.is('.regex')){
             return generator.regexToken(text);

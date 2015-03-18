@@ -5,7 +5,7 @@ define(function() {
         if(token[0] !== token[0].toUpperCase()){
             return generator.productionToken(token)
         } 
-        var m = token.match(/^\{(\+\+|\-\-)?(\w+)(?:\.(\w+))?(?:\(($|\w*)\))?\}$/) ;
+        var m = token.match(/^\{(\+\+|\-\-)?(\w+)(?:\.(\w+))?(?:\((\$|\w*)\))?\}$/) ;
         if(m){
             if(m[1]=== '++'){
                 return generator.semanticToken('push', m[2], undefined, m[4]||false);

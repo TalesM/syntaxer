@@ -13,7 +13,9 @@
             {{/production}}
             {{#semantic}}
                 <span class="def-item semantic {{type}}">{{!
-                    }}{{obj}}{{#action}}.{{action}}{{/action}}{{#parameter}}({{parameter}}){{/parameter}}
+                    }}<span class="obj">{{obj}}</span>{{!
+                    }}{{#action}}.<span class="action">{{action}}</span>{{/action}}{{!
+                    }}{{#parameter}}(<span class="parameter">{{parameter}}</span>){{/parameter}}
                 </span>
             {{/semantic}}
             {{#regex}}

@@ -16,7 +16,11 @@ define(function () {
             return token;
         }
 
-        this.semanticToken = function (token) {
+        this.semanticToken = function (type, obj, action, parameter) {
+            var token = (type==='push')?('++'):((type==='pop')?('--'):'');
+            token += obj;
+            if(action) token += '.'+action;
+            if(parameter) token += '('+parameter+')';
             return '{'+token+'}';
         }
 
