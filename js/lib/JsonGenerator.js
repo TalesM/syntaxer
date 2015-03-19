@@ -10,16 +10,12 @@ define(function () {
             };
         }
 
-        this.semanticToken = function (token) {
-            var matches = token.match(/(?:(begin|end)\-)?([\w\d_]+)?(?:-([\w\d_-]+))?(\[(\$|[\w\d_]+)\])?/);
-            if(!matches){
-                throw new Error('Wrong Format:'+token);
-            }
+        this.semanticToken = function (type, obj, action, parameter) {
             return {
-                type:   matches[1]||'call',
-                object: matches[2],
-                action: matches[3]||null,
-                param:  (matches[4]?(matches[5]=='$'?true:matches[5]):(false))
+                type:   type,
+                object: obj,
+                action: action||null,
+                param:  parameter||null,
             };
         }
 
