@@ -12,11 +12,15 @@ require.config({
         ui: '../ui/',
         util: '../util/',
         jquery: 'jquery-2.1.3.min.js',
+        Mustache: 'mustache.min',
     },
     shim: {
         'jquery.mustache': {
-            deps: [], //TODO: PUT jquery here
+            deps: ['Mustache'], //TODO: PUT jquery here
             exports: 'jQuery.fn.mustache',
+            init: function(Mustache) {
+                this.Mustache = Mustache;
+            },
         },
     },
 });
