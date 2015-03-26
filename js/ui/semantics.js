@@ -1,5 +1,5 @@
-define(['domReady!', 'text!templ/semantics.html'],
-function(dom,         templSemantics            ) { 
+define(['jquery', 'domReady!', 'text!templ/semantics.html'],
+function($,        dom,         templSemantics            ) { 
 	'use strict';
 	return;
     $.Mustache.add('templ-semantics', templSemantics);

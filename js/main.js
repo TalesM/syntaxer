@@ -11,7 +11,7 @@ require.config({
         lib: '../lib/',
         ui: '../ui/',
         util: '../util/',
-        jquery: 'jquery-2.1.3.min.js',
+        jquery: 'jquery-2.1.3.min',
         Mustache: 'mustache.min',
     },
     shim: {

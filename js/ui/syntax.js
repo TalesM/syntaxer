@@ -1,5 +1,5 @@
-define(['lib/SyntaxParser', 'jquery.mustache', 'lib/DomParser', 'lib/TextGenerator', 'lib/TemplGenerator', 'util/utility', 'text!templ/model.syntax', 'domReady!'], 
-function(syntaxParser,       jqueryMustache ,   domParser,       TextGenerator,       TemplGenerator,       utility ,       modelSyntax ,                    doc) {
+define(['jquery', 'lib/SyntaxParser', 'jquery.mustache', 'lib/DomParser', 'lib/TextGenerator', 'lib/TemplGenerator', 'util/utility', 'text!templ/model.syntax', 'domReady!'], 
+function($,        syntaxParser,       jqueryMustache ,   domParser,       TextGenerator,       TemplGenerator,       utility ,       modelSyntax ,                    doc) {
 	'use strict'
     var foundTokens = {};
     var templGenerator = new TemplGenerator(foundTokens);

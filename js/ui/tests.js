@@ -1,5 +1,5 @@
-define(['lib/DomParser', 'lib/JsonGenerator','util/utility', 'domReady!'],
-function(domParser,       JsonGenerator,      utility,  doc) {
+define(['jquery', 'lib/DomParser', 'lib/JsonGenerator','util/utility', 'domReady!'],
+function($,        domParser,       JsonGenerator,      utility,  doc) {
 	'use strict'
 	var $logs = $('#jLogs');
 	function log () {
