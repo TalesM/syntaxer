@@ -8,7 +8,7 @@ window.onerror = function (err) {
 require(['js/config.js'], 
 function (config) {
     require.config(config);
-    require(['ui/syntax', 'ui/export', 'util/templates', 'ui/semantics', 'ui/tests', 'text!templ/model.syntax'], 
-    function (syntaxUi,    exportUi,    templates ,       semantics,      tests,      modelSyntax) {
+    require(['util/templates', 'ui/syntax', 'ui/export', 'ui/semantics', 'ui/tests'], 
+    function (templates ,       syntaxUi,    exportUi,    semantics,      tests    ) {
     });
 });
