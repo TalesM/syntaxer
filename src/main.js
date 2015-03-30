@@ -5,7 +5,7 @@ window.onerror = function (err) {
     console.error(err);
 };
 
-require(['js/config.js'], 
+require(['src/config.js'], 
 function (config) {
     require.config(config);
     require(['util/templates', 'ui/syntax', 'ui/export', 'ui/semantics', 'ui/tests'], 

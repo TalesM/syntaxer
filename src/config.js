@@ -1,5 +1,5 @@
 define({
-    baseUrl: 'js/ext',
+    baseUrl: 'src/ext',
     paths: {
         templ: '../../templ/',
         lib: '../lib/',

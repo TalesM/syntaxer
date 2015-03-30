@@ -8,12 +8,12 @@
 			height: 20em;
 		}
 	</style>
-	<script src="js/ext/r.js"></script>
+	<script src="js/r.js"></script>
 	<script>
 		document.addEventListener('DOMContentLoaded', function (evt) {
 			document.getElementById('build').addEventListener('click', function (evt) {
 				requirejs.optimize({
-					baseUrl: 'js/ext',
+					baseUrl: 'src/ext',
 				    paths: {
 				        templ: '../../templ/',
 				        lib: '../lib/',
