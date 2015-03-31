@@ -36,7 +36,19 @@ define(['text', 'mustache'], function (text, Mustache) {
 
     var sourceMap = {},
         buildMap = {},
-        buildTemplateSource = "define('{pluginName}!{moduleName}', ['mustache'], function (Mustache) { var template = '{content}'; Mustache.parse( template ); return function( view ) { return Mustache.render( template, view ); } });\n";
+        buildTemplateSource = "define('{pluginName}!{moduleName}', [{dependencies}], function (Mustache) { var template = '{content}'; Mustache.parse( template ); return function( view ) { return Mustache.render( template, view ); } });\n";
+
+    function parse(source){
+        var partials = [];
+        Mustache.parse(source).forEach(function partialLooker(element) {
+            if(element[0]=== '>'){
+                partials.push(element[1]);
+            }else if(Array.isArray(element[4])){
+                element[4].forEach(partialLooker);
+            } 
+        });
+        return partials;
+    }
 
     return {
         version: '0.0.3',
@@ -53,26 +65,16 @@ define(['text', 'mustache'], function (text, Mustache) {
                     if (config.isBuild) {
                         onload();
                     } else {
-                        var m = Mustache.parse(source);
+                        var partials = parse(source);
                         buildMap[moduleName] = function( view ) {
                             if(Array.isArray(view)){
                                 return view.map(function(view) {
                                     return Mustache.render( source, view, sourceMap ); 
                                 });
                             }
-                            console.log(sourceMap);  
                             return Mustache.render( source, view, sourceMap ); 
                         };
-                        var partials = [];
-                        m.forEach(function partialLooker(element) {
-                            if(element[0]=== '>'){
-                                partials.push(element[1]);
-                            }else if(Array.isArray(element[4])){
-                                element[4].forEach(partialLooker);
-                            } 
-                        });
                         if(partials.length){
-                            // console.log(m, partials);
                             (function loadWait(partials){
                                 if(partials.length){
                                     var partialName = partials[0];
@@ -97,10 +99,13 @@ define(['text', 'mustache'], function (text, Mustache) {
             var source = sourceMap[moduleName],
                 content = source && text.jsEscape(source);
             if (content) {
+                var dependencies = ['mustache'];
+                dependencies.concat(parse(content).map(function(partial) {return pluginName+'!'+partial}));
                 write.asModule(pluginName + '!' + moduleName,
                     buildTemplateSource
                     .replace('{pluginName}', pluginName)
                     .replace('{moduleName}', moduleName)
+                    .replace('{dependencies}', dependencies.join(','))
                     .replace('{content}', content));
             }
         }
