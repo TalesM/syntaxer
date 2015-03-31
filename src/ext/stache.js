@@ -41,7 +41,7 @@ define(['text', 'mustache'], function (text, Mustache) {
     return {
         version: '0.0.3',
 
-        load: function (moduleName, parentRequire, onload, config) {
+        load: function load(moduleName, parentRequire, onload, config) {
             if (buildMap[moduleName]) {
                 onload(buildMap[moduleName]);
 
@@ -49,20 +49,45 @@ define(['text', 'mustache'], function (text, Mustache) {
                 var ext = (config.stache && config.stache.extension) || '.html';
                 var path = (config.stache && config.stache.path) || '';
                 text.load(path + moduleName + ext, parentRequire, function (source) {
+                    sourceMap[moduleName] = source;
                     if (config.isBuild) {
-                        sourceMap[moduleName] = source;
                         onload();
                     } else {
-                        Mustache.parse(source);
+                        var m = Mustache.parse(source);
                         buildMap[moduleName] = function( view ) {
                             if(Array.isArray(view)){
                                 return view.map(function(view) {
-                                    return Mustache.render( source, view ); 
+                                    return Mustache.render( source, view, sourceMap ); 
                                 });
                             }
-                            return Mustache.render( source, view ); 
+                            console.log(sourceMap);  
+                            return Mustache.render( source, view, sourceMap ); 
                         };
-                        onload(buildMap[moduleName]);
+                        var partials = [];
+                        m.forEach(function partialLooker(element) {
+                            if(element[0]=== '>'){
+                                partials.push(element[1]);
+                            }else if(Array.isArray(element[4])){
+                                element[4].forEach(partialLooker);
+                            } 
+                        });
+                        if(partials.length){
+                            // console.log(m, partials);
+                            (function loadWait(partials){
+                                if(partials.length){
+                                    var partialName = partials[0];
+                                    if(buildMap[partialName]){
+                                        loadWait(partials.slice(1));
+                                    } else {
+                                        load(partialName, parentRequire, function(_) {loadWait(partials.slice(1));}, config);
+                                    }
+                                } else {
+                                    onload(buildMap[moduleName]);
+                                }
+                            })(partials);
+                        } else {
+                            onload(buildMap[moduleName]);
+                        }
                     }
                 }, config);
             }
