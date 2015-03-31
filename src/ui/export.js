@@ -1,4 +1,4 @@
-define(['jquery', 'util/utility', 'Mustache', 'lib/DomParser', 'lib/JsonGenerator', 'domReady!'], 
+define(['jquery', 'util/utility', 'mustache', 'lib/DomParser', 'lib/JsonGenerator', 'domReady!'], 
 function($,        utility,        Mustache ,  domParser,       JsonGenerator ,      doc) {
 	'use strict'
 	$('.jGenerateJson').click(function(event) {

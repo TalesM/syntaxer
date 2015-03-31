@@ -6,14 +6,14 @@ define({
         ui: '../ui/',
         util: '../util/',
         jquery: 'jquery-2.1.3.min',
-        Mustache: 'mustache.min',
+        mustache: 'mustache.min',
     },
     shim: {
         'jquery.mustache': {
-            deps: ['Mustache'], //TODO: PUT jquery here
-            exports: 'jQuery.fn.mustache',
-            init: function(Mustache) {
-                this.Mustache = Mustache;
+            deps: ['mustache'], //TODO: PUT jquery here
+            exports: 'jQuery.fn.Mustache',
+            init: function(mustache) {
+                this.Mustache = mustache;
             },
         },
     },

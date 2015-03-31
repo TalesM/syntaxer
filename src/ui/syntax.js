@@ -1,5 +1,5 @@
-define(['jquery', 'lib/SyntaxParser', 'jquery.mustache', 'lib/DomParser', 'lib/TextGenerator', 'lib/TemplGenerator', 'util/utility', 'text!templ/model.syntax', 'domReady!'], 
-function($,        syntaxParser,       jqueryMustache ,   domParser,       TextGenerator,       TemplGenerator,       utility ,       modelSyntax ,                    doc) {
+define(['jquery', 'stache!templ/syntax','lib/SyntaxParser', 'jquery.mustache', 'lib/DomParser', 'lib/TextGenerator', 'lib/TemplGenerator', 'util/utility', 'text!templ/model.syntax', 'domReady!'], 
+function($,        stacheTempl,          syntaxParser,       jqueryMustache ,   domParser,       TextGenerator,       TemplGenerator,       utility ,       modelSyntax ,                    doc) {
 	'use strict'
     var foundTokens = {};
     var templGenerator = new TemplGenerator(foundTokens);
@@ -28,7 +28,7 @@ function($,        syntaxParser,       jqueryMustache ,   domParser,       TextG
         return '.' + $button.closest('.rule').attr('id');
     }
 
-    $('#definition').on('click', '.jAdd', function(){
+    $('#definition').on('click', '.jAdd', function(){ 
         var even = true;
         var bruteText = $('#input').val().trim();
         if(!bruteText)
