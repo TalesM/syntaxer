@@ -55,6 +55,11 @@ define(['text', 'mustache'], function (text, Mustache) {
                     } else {
                         Mustache.parse(source);
                         buildMap[moduleName] = function( view ) {
+                            if(Array.isArray(view)){
+                                return view.map(function(view) {
+                                    return Mustache.render( source, view ); 
+                                });
+                            }
                             return Mustache.render( source, view ); 
                         };
                         onload(buildMap[moduleName]);

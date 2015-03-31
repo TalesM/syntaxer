@@ -1,5 +1,5 @@
 define(['jquery', 'stache!templ/syntax','lib/SyntaxParser', 'jquery.mustache', 'lib/DomParser', 'lib/TextGenerator', 'lib/TemplGenerator', 'util/utility', 'text!templ/model.syntax', 'domReady!'], 
-function($,        stacheTempl,          syntaxParser,       jqueryMustache ,   domParser,       TextGenerator,       TemplGenerator,       utility ,       modelSyntax ,                    doc) {
+function($,        syntaxTempl,          syntaxParser,       jqueryMustache ,   domParser,       TextGenerator,       TemplGenerator,       utility ,       modelSyntax ,                    doc) {
 	'use strict'
     var foundTokens = {};
     var templGenerator = new TemplGenerator(foundTokens);
@@ -38,7 +38,7 @@ function($,        stacheTempl,          syntaxParser,       jqueryMustache ,   
         if($(this).is('.jAll')){
             $('#definition').mustache('definition', {rules:rules}, { method: 'html' });
         }else {
-            $('.output').mustache('syntax', rules);
+            $('.output').append(syntaxTempl(rules));
         }
         utility.resizeTextArea($('#input').val(''));
         refreshExtraTokens();
@@ -175,7 +175,7 @@ function($,        stacheTempl,          syntaxParser,       jqueryMustache ,   
         }
         
         if(rules.length){
-            $editRule.mustache('syntax', rules, { method: 'before' });
+            $editRule.before(syntaxTempl(rules));
         } else {
             $editRule.nextAll().toggleClass('even');
         }
