@@ -17,4 +17,8 @@ define({
             },
         },
     },
+    stache: {
+        // extension: '.stache', // default = '.html'
+        path: 'templ/' // default = ''
+    },
 });

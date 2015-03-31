@@ -1,5 +1,5 @@
-define(['jquery', 'stache!templ/syntax','lib/SyntaxParser', 'jquery.mustache', 'lib/DomParser', 'lib/TextGenerator', 'lib/TemplGenerator', 'util/utility', 'text!templ/model.syntax', 'domReady!'], 
-function($,        syntaxTempl,          syntaxParser,       jqueryMustache ,   domParser,       TextGenerator,       TemplGenerator,       utility ,       modelSyntax ,                    doc) {
+define(['jquery', 'stache!syntax', 'stache!definition', 'lib/SyntaxParser', 'jquery.mustache', 'lib/DomParser', 'lib/TextGenerator', 'lib/TemplGenerator', 'util/utility', 'text!templ/model.syntax', 'domReady!'], 
+function($,        syntaxTempl,           definitionTempl,           syntaxParser,       jqueryMustache ,   domParser,       TextGenerator,       TemplGenerator,       utility ,       modelSyntax ,                    doc) {
 	'use strict'
     var foundTokens = {};
     var templGenerator = new TemplGenerator(foundTokens);
@@ -36,7 +36,8 @@ function($,        syntaxTempl,          syntaxParser,       jqueryMustache ,   
         var rules = syntaxParser.parse(bruteText, templGenerator);
         $('.buttons').show();
         if($(this).is('.jAll')){
-            $('#definition').mustache('definition', {rules:rules}, { method: 'html' });
+            $('#definition').html(definitionTempl({rules:rules}));
+            // $('#definition').mustache('definition', {rules:rules}, { method: 'html' });
         }else {
             $('.output').append(syntaxTempl(rules));
         }
