@@ -1,6 +1,8 @@
-define(['jquery', 'util/utility', 'mustache', 'lib/DomParser', 'lib/JsonGenerator', 'domReady!'], 
-function($,        utility,        Mustache ,  domParser,       JsonGenerator ,      doc) {
+define(['jquery', 'mustache', 'util/utility', 'lib/DomParser', 'lib/JsonGenerator', 'text!templ/Tokenizer.js', 'text!templ/Parser.js', 'domReady!'], 
+function($,        Mustache ,  utility,        domParser,       JsonGenerator ,      templTokenizer,            templParser,            doc) {
 	'use strict'
+    utility.resizeTextArea($('#jTemplTokenizer').val(templTokenizer));
+    utility.resizeTextArea($('#jTemplParser').val(templParser));
 	$('.jGenerateJson').click(function(event) {
         var result = domParser.parse($('#definition'), new JsonGenerator());
         this.href = 'data:,'+encodeURIComponent(JSON.stringify(result));

@@ -1,5 +1,5 @@
-define(['jquery', 'stache!syntax', 'stache!definition', 'lib/SyntaxParser', 'jquery.mustache', 'lib/DomParser', 'lib/TextGenerator', 'lib/TemplGenerator', 'util/utility', 'text!templ/model.syntax', 'domReady!'], 
-function($,        syntaxTempl,           definitionTempl,           syntaxParser,       jqueryMustache ,   domParser,       TextGenerator,       TemplGenerator,       utility ,       modelSyntax ,                    doc) {
+define(['jquery', 'stache!syntax', 'stache!definition', 'stache!edit', 'lib/SyntaxParser', 'lib/DomParser', 'lib/TextGenerator', 'lib/TemplGenerator', 'util/utility', 'text!templ/model.syntax', 'domReady!'], 
+function($,        templSyntax,     templDefinition,     templEdit,     syntaxParser,       domParser,       TextGenerator,       TemplGenerator,       utility ,       modelSyntax ,                    doc) {
 	'use strict'
     var foundTokens = {};
     var templGenerator = new TemplGenerator(foundTokens);
@@ -36,10 +36,9 @@ function($,        syntaxTempl,           definitionTempl,           syntaxParse
         var rules = syntaxParser.parse(bruteText, templGenerator);
         $('.buttons').show();
         if($(this).is('.jAll')){
-            $('#definition').html(definitionTempl({rules:rules}));
-            // $('#definition').mustache('definition', {rules:rules}, { method: 'html' });
+            $('#definition').html(templDefinition({rules:rules}));
         }else {
-            $('.output').append(syntaxTempl(rules));
+            $('.output').append(templSyntax(rules));
         }
         utility.resizeTextArea($('#input').val(''));
         refreshExtraTokens();
@@ -55,7 +54,7 @@ function($,        syntaxTempl,           definitionTempl,           syntaxParse
 
         textGenerator.spaces(spaces);
         var input = domParser.parse($('#definition'), textGenerator);
-        $('#definition').mustache('definition', {text:input}, { method: 'html' });
+        $('#definition').html(templDefinition({text:input}));
         utility.resizeTextArea($('#input'));
     });
     $('#definition').on('click', '.jToogle', function(){
@@ -106,10 +105,10 @@ function($,        syntaxTempl,           definitionTempl,           syntaxParse
         
         var $currentHead = $current.first();
         $currentHead.children(':not(.name)').remove();
-        $currentHead.mustache('templ-edit', {
+        $currentHead.append(templEdit({
             production:isProduction,
             value:newVal
-        });
+        }));
         $currentHead.data('even', $current.hasClass('even'))
                     .data('production', isProduction);
         $current.not($currentHead).remove();
@@ -176,7 +175,7 @@ function($,        syntaxTempl,           definitionTempl,           syntaxParse
         }
         
         if(rules.length){
-            $editRule.before(syntaxTempl(rules));
+            $editRule.before(templSyntax(rules));
         } else {
             $editRule.nextAll().toggleClass('even');
         }
@@ -192,6 +191,6 @@ function($,        syntaxTempl,           definitionTempl,           syntaxParse
     ////////////
     //Loading //
     ////////////
-    $('#definition').mustache('definition', {text: $('#input').val()||modelSyntax}, { method: 'html' });
+    $('#definition').html(templDefinition({text: $('#input').val()||modelSyntax}));
     utility.resizeTextArea($('#input'));
 })
