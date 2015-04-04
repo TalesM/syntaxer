@@ -35,19 +35,18 @@ define(['text', 'mustache'], function (text, Mustache) {
     'use strict';
 
     var sourceMap = {},
-        buildMap = {},
-        buildTemplateSource = "define('{pluginName}!{moduleName}', [{dependencies}], function (Mustache) { var template = '{content}'; Mustache.parse( template ); return function( view ) { return Mustache.render( template, view ); } });\n";
+        buildMap = {};
 
     function parse(source){
-        var partials = [];
+        var partials = {};
         Mustache.parse(source).forEach(function partialLooker(element) {
             if(element[0]=== '>'){
-                partials.push(element[1]);
+                partials[element[1]] = true;
             }else if(Array.isArray(element[4])){
                 element[4].forEach(partialLooker);
             } 
         });
-        return partials;
+        return Object.keys(partials);
     }
 
     return {
@@ -66,13 +65,8 @@ define(['text', 'mustache'], function (text, Mustache) {
                         onload();
                     } else {
                         var partials = parse(source);
-                        buildMap[moduleName] = function( view ) {
-                            if(Array.isArray(view)){
-                                return view.map(function(view) {
-                                    return Mustache.render( source, view, sourceMap ); 
-                                });
-                            }
-                            return Mustache.render( source, view, sourceMap ); 
+                        buildMap[moduleName] = function build( view ) {
+                            return Array.isArray(view)? view.map(build): Mustache.render( source, view, sourceMap ); 
                         };
                         if(partials.length){
                             (function loadWait(partials){
@@ -99,14 +93,28 @@ define(['text', 'mustache'], function (text, Mustache) {
             var source = sourceMap[moduleName],
                 content = source && text.jsEscape(source);
             if (content) {
-                var dependencies = ['mustache'];
-                dependencies.concat(parse(content).map(function(partial) {return pluginName+'!'+partial}));
-                write.asModule(pluginName + '!' + moduleName,
-                    buildTemplateSource
-                    .replace('{pluginName}', pluginName)
-                    .replace('{moduleName}', moduleName)
-                    .replace('{dependencies}', dependencies.join(','))
-                    .replace('{content}', content));
+                var dependencies = parse(content);
+                if(dependencies.length){
+                    var partials = dependencies.map(function(partial) {return '"'+pluginName+'!'+partial+'"';}).join(',');
+                    var params = dependencies.map(function(partial) {return partial;}).join(',');
+                    var array = dependencies.map(function(partial) {return partial+':'+partial+'.source';}).join(',');
+                    var buildTemplateSource = "define('{pluginName}!{moduleName}', ['mustache',{partials}], function (Mustache,{params}) { var template = '{content}', dependencies = {{array}}; Mustache.parse( template ); function build( view ) { return Array.isArray(view)? view.map(build): Mustache.render( template, view, dependencies );}; build.source=template; return build; });\n";
+                    write.asModule(pluginName + '!' + moduleName,
+                        buildTemplateSource
+                        .replace('{pluginName}', pluginName)
+                        .replace('{moduleName}', moduleName)
+                        .replace('{partials}', partials)
+                        .replace('{params}', params)
+                        .replace('{array}', array)
+                        .replace('{content}', content));
+                } else {
+                    var buildTemplateSource = "define('{pluginName}!{moduleName}', ['mustache'], function (Mustache) { var template = '{content}'; Mustache.parse( template ); function build( view ) { return Array.isArray(view)? view.map(build): Mustache.render( template, view );};build.source=template; return build; });\n";
+                    write.asModule(pluginName + '!' + moduleName,
+                        buildTemplateSource
+                        .replace('{pluginName}', pluginName)
+                        .replace('{moduleName}', moduleName)
+                        .replace('{content}', content));
+                }
             }
         }
     };

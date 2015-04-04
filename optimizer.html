@@ -20,9 +20,13 @@
 				        ui: '../ui/',
 				        util: '../util/',
 				        jquery: 'jquery-2.1.3.min',
-				        Mustache: 'mustache.min',
+				        mustache: 'mustache.min',
 				    },
-					include: ['util/templates', 'ui/syntax', 'ui/export', 'ui/semantics', 'ui/tests'],
+				    stache: {
+				        path: 'templ/',
+				    },
+				    stubModules: ['text', 'stache'],
+					include: ['ui/main'],
 					out: function (text) {
 						document.getElementById('output').value = text;
 					}

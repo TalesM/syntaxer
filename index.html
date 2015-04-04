@@ -47,7 +47,25 @@
     .type tr:nth-child(2n){background: #eee}*/
 
     </style>
-    <script data-main="src/main" src="js/require.js"></script>
+    <script id="require"  src="js/require.js"></script>
+    <script type="text/javascript">
+        var debug = false;
+        //Comment out the next two lines to go back to loading
+        //the non-optimized main.js source file.
+        
+        if(debug){
+            console.log('debug');
+            require(["src/main"]); 
+        } else {
+            require.config({
+                paths: {
+                    "ui/main": "js/built"
+                }
+            });
+            require(["ui/main"]);
+        }
+        //Uncomment...
+    </script>
 </head>
 <body>
 <div class="pure-menu pure-menu-horizontal main-menu">
