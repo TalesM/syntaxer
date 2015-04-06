@@ -9,31 +9,19 @@
 		}
 	</style>
 	<script src="js/r.js"></script>
+	<script src="js/require.js"></script>
 	<script>
 		document.addEventListener('DOMContentLoaded', function (evt) {
-			document.getElementById('build').addEventListener('click', function (evt) {
-				requirejs.optimize({
-					baseUrl: 'src/ext',
-				    paths: {
-				        templ: '../../templ/',
-				        lib: '../lib/',
-				        ui: '../ui/',
-				        util: '../util/',
-				        jquery: 'jquery-2.1.3.min',
-				        mustache: 'mustache.min',
-				    },
-				    stache: {
-				        path: 'templ/',
-				    },
-				    stubModules: ['text', 'stache'],
-					include: ['ui/main'],
-					out: function (text) {
-						document.getElementById('output').value = text;
-					}
-				}, function (buildText) {
-					document.getElementById('buildMessages').value = buildText;
-				});
-			}, false);
+			require(['src/config'], function(config) {
+				config.out = function (text) {
+					document.getElementById('output').value = text;
+				};
+				document.getElementById('build').addEventListener('click', function (evt) {
+					requirejs.optimize( config, function (buildText) {
+						document.getElementById('buildMessages').value = buildText;
+					});
+				}, false);
+			});
 		}, false);
 	</script>
 </head>

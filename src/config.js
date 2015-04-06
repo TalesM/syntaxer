@@ -2,6 +2,7 @@ define({
     baseUrl: 'src/ext',
     paths: {
         templ: '../../templ/',
+        tests: '../../tests/',
         lib: '../lib/',
         ui: '../ui/',
         util: '../util/',
@@ -12,4 +13,6 @@ define({
         // extension: '.stache', // default = '.html'
         path: 'templ/' // default = ''
     },
+    stubModules: ['text', 'stache'],
+    include: ['ui/main'],
 });
