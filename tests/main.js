@@ -8,5 +8,5 @@ window.onerror = function (err) {
 require(['src/config.js'], 
 function (config) {
     require.config(config);
-    require(['tests/tests'], function (main) {});
+    require(['q!tests/tests'], function (main) {});
 });
