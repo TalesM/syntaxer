@@ -1,6 +1,7 @@
-define(function() {
+define(['QUnit'], function(QUnit) {
 	var currentName = '';
 	var currentTest;
+	QUnit.start();
 	return {
 	load: function(name, parentRequire, onload, config) {
 		if(!name){
